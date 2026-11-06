@@ -1,0 +1,23 @@
+{
+  "name": "@future-health/fhir-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test src/__tests__/gateway.test.ts"
+  },
+  "dependencies": {
+    "@future-health/domain": "workspace:*",
+    "@future-health/fhir": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2"
+  }
+}
+

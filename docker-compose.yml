@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # Next.js 15 Web Portal (Patients, Doctors, Researchers, Admins)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: future-health-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_anon_key}
+      - NEXT_PUBLIC_AI_ENGINE_URL=http://ai-engine:8000
+      - NEXT_PUBLIC_FHIR_GATEWAY_URL=http://fhir-gateway:8080
+    depends_on:
+      ai-engine:
+        condition: service_healthy
+      fhir-gateway:
+        condition: service_healthy
+    networks:
+      - future-health-net
+
+  # Python FastAPI Clinical Decision Support & AI Screening Service
+  ai-engine:
+    build:
+      context: ./services/ai-engine
+      dockerfile: Dockerfile
+    container_name: future-health-ai-engine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-chars-long}
+      - MODEL_VERSION=v1.0.0-clinical
+    networks:
+      - future-health-net
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # HL7 FHIR R4 Interoperability Gateway
+  fhir-gateway:
+    build:
+      context: .
+      dockerfile: services/fhir-gateway/Dockerfile
+    container_name: future-health-fhir-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-dummy_service_role_key}
+    networks:
+      - future-health-net
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8080/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  future-health-net:
+    driver: bridge
+

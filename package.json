@@ -1,0 +1,25 @@
+{
+  "name": "future-health-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Future Health - Complete Digital Health Platform Monorepo",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.2",
+    "rimraf": "^6.0.1"
+  },
+  "overrides": {
+    "@types/react": "~19.1.17",
+    "@types/react-dom": "~19.1.7"
+  },
+  "packageManager": "pnpm@11.6.0"
+}
+

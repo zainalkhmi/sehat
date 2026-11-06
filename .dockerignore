@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+.next
+dist
+build
+.git
+.pytest_cache
+__pycache__
+*.pyc
+.env*.local
+*.log
+coverage
+

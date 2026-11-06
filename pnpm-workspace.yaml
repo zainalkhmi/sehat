@@ -1,0 +1,8 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'services/*'
+  - 'apps/mobile/packages/*'
+allowBuilds:
+  react-native-nitro-modules: true
+  sharp: true
