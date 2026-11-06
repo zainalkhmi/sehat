@@ -10,7 +10,7 @@ const nextConfig = {
     '@future-health/validation',
   ],
   reactStrictMode: true,
-  output: 'standalone',
+  output: process.env.DOCKER_BUILD ? 'standalone' : undefined,
 };
 
 export default nextConfig;
