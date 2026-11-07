@@ -32,6 +32,7 @@ import {
   Smartphone,
   RefreshCw,
   ShieldCheck,
+  Sparkles,
   Check,
   X,
   ExternalLink
@@ -169,6 +170,14 @@ export default function DoctorDashboard() {
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span className="hidden md:inline">{satuSehatSynced ? 'SatuSehat: Synced' : 'Sync SatuSehat'}</span>
             </button>
+
+            <Link
+              href="/chat"
+              className="text-xs bg-emerald-700/80 hover:bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg border border-emerald-500/50 shadow-sm transition flex items-center space-x-1"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+              <span>Glass AI Chat</span>
+            </Link>
 
             <Link
               href="/dashboard/doctor/medx"

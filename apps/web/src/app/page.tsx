@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Activity, ShieldCheck, HeartPulse, Stethoscope, Microscope, ArrowRight, Smartphone, Database, Brain } from 'lucide-react';
+import { Activity, ShieldCheck, HeartPulse, Stethoscope, Microscope, ArrowRight, Smartphone, Database, Brain, Sparkles, MessageSquare } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -16,7 +16,14 @@ export default function HomePage() {
               <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">FHIR R4</span>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <Link
+              href="/chat"
+              className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-colors flex items-center gap-1.5 shadow-2xs"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Glass AI Chat</span>
+            </Link>
             <Link
               href="/dashboard/doctor/medx"
               className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-cyan-50 border border-cyan-200 text-cyan-800 hover:bg-cyan-100 transition-colors flex items-center gap-1.5"
@@ -55,6 +62,14 @@ export default function HomePage() {
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/chat"
+              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Glass AI Encounter</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
             <Link
               href="/dashboard/patient"
               className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-medium shadow-md shadow-sky-600/20 transition-all hover:-translate-y-0.5"

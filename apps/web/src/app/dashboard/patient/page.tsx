@@ -246,6 +246,14 @@ export default function PatientDashboard() {
             <SupabaseBadge />
 
             {/* Quick Actions */}
+            <Link
+              href="/chat"
+              className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-semibold px-3 py-1.5 rounded-lg shadow-2xs transition flex items-center space-x-1"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Glass AI Chat</span>
+            </Link>
+
             <button
               onClick={handleDownloadReport}
               className={`text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center space-x-1.5 transition ${
