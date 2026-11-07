@@ -58,6 +58,8 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. SEED RESEARCH PROJECT (IRB Approved Study)
+ALTER TABLE IF EXISTS research_projects ALTER COLUMN lead_researcher_id DROP NOT NULL;
+
 INSERT INTO research_projects (
     id,
     title,
@@ -74,7 +76,7 @@ INSERT INTO research_projects (
     'Longitudinal Cardiovascular & Mental Health Cohort Study',
     'FH-IRB-2026-08',
     'Investigating continuous wearable blood pressure, heart rate variability, and depressive symptoms in ambulatory adults using remote physiological telemetry.',
-    '00000000-0000-0000-0000-000000000003', -- Placeholder researcher profile UUID
+    NULL,
     'a0000000-0000-0000-0000-000000000002',
     'active',
     '2026-01-01',

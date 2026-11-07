@@ -276,7 +276,7 @@ CREATE TABLE research_projects (
     title VARCHAR(255) NOT NULL,
     protocol_number VARCHAR(100) UNIQUE NOT NULL, -- e.g. 'FH-IRB-2026-08'
     description TEXT,
-    lead_researcher_id UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
+    lead_researcher_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
     organization_id UUID REFERENCES organizations(id) ON DELETE SET NULL,
     status research_project_status NOT NULL DEFAULT 'recruiting',
     start_date DATE NOT NULL,
