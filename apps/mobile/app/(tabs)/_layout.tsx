@@ -41,61 +41,66 @@ export default function TabLayout() {
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
           headerShown: false,
           tabBarButton: HapticTab,
+          tabBarStyle: {
+            elevation: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 4,
+          },
         }}>
         <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="house.fill" color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: 'Explore',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="contacts"
-          options={{
-            title: 'Contacts',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.2.fill" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-        name="chat"
-        options={{
-          title: 'Chat',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="message.fill" color={color} />,
-        }}
-      />
-        <Tabs.Screen
-        name="schedule"
-        options={{
-          title: 'Schedule',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
-        }}
-      />
         <Tabs.Screen
           name="devices"
           options={{
             title: 'Devices',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="sensor" color={color} />,
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="sensor" color={color} />,
           }}
         />
         <Tabs.Screen
           name="measurements"
           options={{
             title: 'Measurements',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="waveform.path.ecg" color={color} />,
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="waveform.path.ecg" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="chat"
+          options={{
+            title: 'Chat',
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="message.fill" color={color} />,
           }}
         />
         <Tabs.Screen
           name="health"
           options={{
             title: 'Health',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="heart.fill" color={color} />,
+          }}
+        />
+        {/* Secondary screens hidden from bottom tab bar to prevent clutter, accessible via Home 6-Pack Menu */}
+        <Tabs.Screen
+          name="schedule"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="explore"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="contacts"
+          options={{
+            href: null,
           }}
         />
       </Tabs>
