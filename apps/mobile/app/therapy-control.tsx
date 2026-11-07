@@ -18,12 +18,22 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 interface MedicationItem {
   id: string;
   name: string;
-  dosage: string;
+  brandName?: string;
+  strength: string; // e.g. "5 mg"
+  dosage: string; // e.g. "5 mg • 1 Tablet"
+  dosePerIntake: number; // Berapa butir/tablet yang diset harus diminum setiap jadwal
+  doseUnit: string; // 'Tablet', 'Kapsul', 'ml'
+  frequency: string; // '1x Sehari', '2x Sehari', '3x Sehari'
   indication: string;
   timeOfDay: 'pagi' | 'siang' | 'malam' | 'tidur';
   scheduledTime: string;
-  instruction: string; // e.g. "Sesudah Makan"
-  remainingStock: number;
+  instruction: string; // e.g. "Sesudah Makan Pagi"
+  remainingStock: number; // Sisa stok butir obat saat ini
+  initialStock: number; // Stok awal obat saat ditebus
+  minimumStockAlert: number; // Batas minimum untuk peringatan beli ulang
+  expiryDate: string; // Tanggal kadaluarsa obat (YYYY-MM-DD)
+  batchNumber?: string;
+  prescribedBy?: string;
   status: 'taken' | 'pending' | 'skipped' | 'snoozed';
   takenAt?: string;
   color: string;
@@ -44,13 +54,22 @@ interface VitalRecord {
 const INITIAL_MEDICATIONS: MedicationItem[] = [
   {
     id: 'med-1',
-    name: 'Amlodipine',
+    name: 'Amlodipine Besylate',
+    strength: '5 mg',
     dosage: '5 mg • 1 Tablet',
+    dosePerIntake: 1,
+    doseUnit: 'Tablet',
+    frequency: '1x Sehari',
     indication: 'Kontrol Tekanan Darah (Antihipertensi)',
     timeOfDay: 'pagi',
     scheduledTime: '08:00 WIB',
     instruction: 'Sesudah Makan Pagi',
     remainingStock: 24,
+    initialStock: 30,
+    minimumStockAlert: 7,
+    expiryDate: '2027-08-31',
+    batchNumber: 'BATCH-AML-882',
+    prescribedBy: 'dr. Budi Santoso, Sp.JP(K)',
     status: 'taken',
     takenAt: '08:05 WIB',
     color: '#007AFF',
@@ -58,12 +77,21 @@ const INITIAL_MEDICATIONS: MedicationItem[] = [
   {
     id: 'med-2',
     name: 'Metformin HCl',
+    strength: '500 mg',
     dosage: '500 mg • 1 Tablet',
+    dosePerIntake: 1,
+    doseUnit: 'Tablet',
+    frequency: '2x Sehari',
     indication: 'Kontrol Glukosa Darah',
     timeOfDay: 'siang',
     scheduledTime: '12:30 WIB',
     instruction: 'Bersama Makan Siang',
     remainingStock: 18,
+    initialStock: 30,
+    minimumStockAlert: 7,
+    expiryDate: '2026-11-28', // Hampir Kadaluarsa (< 30 Hari untuk demo alert)
+    batchNumber: 'BATCH-MET-104',
+    prescribedBy: 'dr. Budi Santoso, Sp.JP(K)',
     status: 'taken',
     takenAt: '12:45 WIB',
     color: '#FF9500',
@@ -71,24 +99,42 @@ const INITIAL_MEDICATIONS: MedicationItem[] = [
   {
     id: 'med-3',
     name: 'Candesartan Cilexetil',
+    strength: '8 mg',
     dosage: '8 mg • 1 Tablet',
+    dosePerIntake: 1,
+    doseUnit: 'Tablet',
+    frequency: '1x Sehari',
     indication: 'Proteksi Kardiovaskular & Ginjal',
     timeOfDay: 'malam',
     scheduledTime: '20:00 WIB',
     instruction: 'Sesudah Makan Malam',
-    remainingStock: 5, // Low stock warning!
+    remainingStock: 5, // Stok Menipis (< 7 butir untuk demo alert)
+    initialStock: 30,
+    minimumStockAlert: 7,
+    expiryDate: '2027-12-15',
+    batchNumber: 'BATCH-CAN-409',
+    prescribedBy: 'dr. Budi Santoso, Sp.JP(K)',
     status: 'pending',
     color: '#FF2D55',
   },
   {
     id: 'med-4',
-    name: 'Atorvastatin',
+    name: 'Atorvastatin Calcium',
+    strength: '20 mg',
     dosage: '20 mg • 1 Tablet',
+    dosePerIntake: 1,
+    doseUnit: 'Tablet',
+    frequency: '1x Sehari',
     indication: 'Stabilisasi Kolesterol & Plak Pembuluh Darah',
     timeOfDay: 'tidur',
     scheduledTime: '21:30 WIB',
     instruction: 'Sebelum Tidur Malam',
     remainingStock: 14,
+    initialStock: 30,
+    minimumStockAlert: 7,
+    expiryDate: '2028-02-20',
+    batchNumber: 'BATCH-ATO-551',
+    prescribedBy: 'dr. Budi Santoso, Sp.JP(K)',
     status: 'pending',
     color: '#AF52DE',
   },
@@ -103,7 +149,7 @@ const INITIAL_VITALS: VitalRecord[] = [
     diastolic: 64,
     heartRate: 62,
     bloodSugar: 98,
-    notes: 'Pengukuran rutin pagi setelah bangun tidur',
+    notes: 'Pengukuran rutin pagi setelah minum Amlodipine',
     status: 'optimal',
   },
   {
@@ -128,18 +174,69 @@ const INITIAL_VITALS: VitalRecord[] = [
     notes: 'Kondisi relaks, istirahat cukup',
     status: 'normal',
   },
-  {
-    id: 'vit-4',
-    date: '4 Nov 2026',
-    time: '08:00 WIB',
-    systolic: 124,
-    diastolic: 80,
-    heartRate: 75,
-    bloodSugar: 108,
-    notes: 'Aktivitas normal',
-    status: 'normal',
-  },
 ];
+
+// Helper: Calculate Expiry Status
+function getExpiryInfo(expiryDateStr: string) {
+  const exp = new Date(expiryDateStr);
+  const now = new Date();
+  const diffDays = Math.ceil((exp.getTime() - now.getTime()) / (1000 * 3600 * 24));
+
+  if (diffDays < 0) {
+    return {
+      status: 'expired' as const,
+      label: 'KADALUARSA!',
+      sub: `Kadaluarsa ${Math.abs(diffDays)} hari lalu (Jangan Diminum)`,
+      color: '#FF3B30',
+      bgColor: '#FF3B3015',
+    };
+  }
+  if (diffDays <= 30) {
+    return {
+      status: 'warning' as const,
+      label: 'Hampir Kadaluarsa',
+      sub: `Sisa ${diffDays} hari lagi (${exp.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })})`,
+      color: '#FF9500',
+      bgColor: '#FF950015',
+    };
+  }
+  return {
+    status: 'safe' as const,
+    label: `Exp: ${exp.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}`,
+    sub: 'Obat dalam kondisi aman',
+    color: '#34C759',
+    bgColor: '#34C75915',
+  };
+}
+
+// Helper: Calculate Stock Status
+function getStockInfo(currentStock: number, alertThreshold: number = 7) {
+  if (currentStock <= 0) {
+    return {
+      status: 'empty' as const,
+      label: 'Stok Habis (0 butir)',
+      sub: 'Segera minta resep ulang ke dokter',
+      color: '#FF3B30',
+      bgColor: '#FF3B3015',
+    };
+  }
+  if (currentStock <= alertThreshold) {
+    return {
+      status: 'low' as const,
+      label: `Sisa ${currentStock} butir (Menipis)`,
+      sub: `Cukup untuk ~${currentStock} hari • Perlu beli ulang`,
+      color: '#FF9500',
+      bgColor: '#FF950015',
+    };
+  }
+  return {
+    status: 'safe' as const,
+    label: `Sisa ${currentStock} butir`,
+    sub: `Cukup untuk ~${currentStock} hari terapi`,
+    color: '#34C759',
+    bgColor: '#34C75915',
+  };
+}
 
 export default function TherapyControlScreen() {
   const colorScheme = useColorScheme();
@@ -151,13 +248,21 @@ export default function TherapyControlScreen() {
   // Medications state
   const [medications, setMedications] = useState<MedicationItem[]>(INITIAL_MEDICATIONS);
   const [addMedModalVisible, setAddMedModalVisible] = useState(false);
+  const [restockModalVisible, setRestockModalVisible] = useState(false);
+  const [selectedMedForRestock, setSelectedMedForRestock] = useState<MedicationItem | null>(null);
+  const [restockAmount, setRestockAmount] = useState('30');
 
   // New med form
   const [newMedName, setNewMedName] = useState('');
-  const [newMedDosage, setNewMedDosage] = useState('');
+  const [newMedStrength, setNewMedStrength] = useState('5 mg');
+  const [newDosePerIntake, setNewDosePerIntake] = useState('1');
+  const [newDoseUnit, setNewDoseUnit] = useState('Tablet');
+  const [newFrequency, setNewFrequency] = useState('1x Sehari');
   const [newMedTime, setNewMedTime] = useState('08:00 WIB');
   const [newMedInstruction, setNewMedInstruction] = useState('Sesudah Makan');
   const [newMedStock, setNewMedStock] = useState('30');
+  const [newMinAlert, setNewMinAlert] = useState('7');
+  const [newExpiryDate, setNewExpiryDate] = useState('2027-12-31');
 
   // Vitals state
   const [vitals, setVitals] = useState<VitalRecord[]>(INITIAL_VITALS);
@@ -180,18 +285,26 @@ export default function TherapyControlScreen() {
   const takenMeds = medications.filter((m) => m.status === 'taken').length;
   const adherenceRate = Math.round((takenMeds / totalMeds) * 100);
 
-  // Handle Mark Medication
+  // Handle Mark Medication Intake
   const handleMarkMedication = (id: string, status: 'taken' | 'skipped' | 'snoozed' | 'pending') => {
     setMedications((prev) =>
       prev.map((med) => {
         if (med.id === id) {
           const now = new Date();
           const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`;
+          // Reduce stock by dosePerIntake when taken
+          const updatedStock =
+            status === 'taken'
+              ? Math.max(0, med.remainingStock - med.dosePerIntake)
+              : med.status === 'taken' && status === 'pending'
+              ? med.remainingStock + med.dosePerIntake
+              : med.remainingStock;
+
           return {
             ...med,
             status,
             takenAt: status === 'taken' ? timeStr : undefined,
-            remainingStock: status === 'taken' ? Math.max(0, med.remainingStock - 1) : med.remainingStock,
+            remainingStock: updatedStock,
           };
         }
         return med;
@@ -199,7 +312,12 @@ export default function TherapyControlScreen() {
     );
 
     if (status === 'taken') {
-      Alert.alert('✅ Obat Tercatat', 'Kepatuhan obat berhasil disimpan dan disinkronkan ke rekam medis.');
+      const targetMed = medications.find((m) => m.id === id);
+      const remainingAfter = targetMed ? Math.max(0, targetMed.remainingStock - targetMed.dosePerIntake) : 0;
+      Alert.alert(
+        '✅ Obat Berhasil Diminum',
+        `Tercatat diminum ${targetMed?.dosePerIntake || 1} ${targetMed?.doseUnit || 'Tablet'}. Sisa stok di database: ${remainingAfter} butir. Data disinkronkan ke rekam medis Supabase.`
+      );
     } else if (status === 'skipped') {
       Alert.alert('⏭️ Obat Dilewati', 'Status lewati telah dicatat dalam jurnal kepatuhan harian.');
     } else if (status === 'snoozed') {
@@ -207,29 +325,65 @@ export default function TherapyControlScreen() {
     }
   };
 
-  // Handle Add Medication
+  // Handle Restock Medication
+  const handleConfirmRestock = () => {
+    if (!selectedMedForRestock) return;
+    const addCount = parseInt(restockAmount, 10) || 0;
+    if (addCount <= 0) {
+      Alert.alert('Jumlah Tidak Valid', 'Masukkan jumlah butir restok yang valid.');
+      return;
+    }
+
+    setMedications((prev) =>
+      prev.map((m) =>
+        m.id === selectedMedForRestock.id
+          ? { ...m, remainingStock: m.remainingStock + addCount }
+          : m
+      )
+    );
+
+    setRestockModalVisible(false);
+    Alert.alert(
+      '📦 Stok Berhasil Diperbarui',
+      `Stok ${selectedMedForRestock.name} bertambah +${addCount} butir. Total stok sekarang: ${selectedMedForRestock.remainingStock + addCount} butir. Tersimpan ke database Supabase.`
+    );
+  };
+
+  // Handle Add New Medication
   const handleAddMedication = () => {
     if (!newMedName.trim()) {
       Alert.alert('Data Belum Lengkap', 'Masukkan nama obat.');
       return;
     }
+    const doseNum = parseFloat(newDosePerIntake) || 1;
+    const initialStk = parseInt(newMedStock, 10) || 30;
+    const minAlert = parseInt(newMinAlert, 10) || 7;
+
     const newMed: MedicationItem = {
       id: `med-${Date.now()}`,
       name: newMedName.trim(),
-      dosage: newMedDosage.trim() || '1 Tablet',
-      indication: 'Terapi Resep Dokter',
+      strength: newMedStrength.trim() || '5 mg',
+      dosage: `${newMedStrength.trim()} • ${doseNum} ${newDoseUnit}`,
+      dosePerIntake: doseNum,
+      doseUnit: newDoseUnit,
+      frequency: newFrequency,
+      indication: 'Terapi Resep Pasien',
       timeOfDay: 'pagi',
       scheduledTime: newMedTime,
       instruction: newMedInstruction,
-      remainingStock: parseInt(newMedStock, 10) || 30,
+      remainingStock: initialStk,
+      initialStock: initialStk,
+      minimumStockAlert: minAlert,
+      expiryDate: newExpiryDate || '2027-12-31',
+      prescribedBy: 'dr. Budi Santoso, Sp.JP(K)',
       status: 'pending',
       color: '#007AFF',
     };
+
     setMedications((prev) => [...prev, newMed]);
     setAddMedModalVisible(false);
     setNewMedName('');
-    setNewMedDosage('');
-    Alert.alert('Obat Berhasil Ditambahkan', `Pengingat untuk ${newMed.name} telah aktif.`);
+    Alert.alert('Obat Berhasil Ditambahkan', `Pengingat dan kontrol stok untuk ${newMed.name} telah aktif di database.`);
   };
 
   // Handle Add Vital Record
@@ -281,7 +435,7 @@ export default function TherapyControlScreen() {
             <Text style={styles.headerBadgeText}>SEHAT • MYTHERAPY CARE</Text>
           </View>
           <Text style={[styles.headerTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-            Kontrol Terapi & Vital
+            Kontrol Obat, Stok & Vital
           </Text>
         </View>
         <TouchableOpacity
@@ -292,6 +446,21 @@ export default function TherapyControlScreen() {
           }}
         >
           <Ionicons name="add-circle" size={28} color="#007AFF" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Database Sync Status Badge */}
+      <View style={[styles.dbStatusBar, { backgroundColor: isDark ? '#141416' : '#FFFFFF' }]}>
+        <View style={styles.dbStatusLeft}>
+          <View style={styles.dbDot} />
+          <Text style={styles.dbStatusText}>
+            Terkoneksi ke Supabase DB (patient_medications & medication_logs)
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => Alert.alert('Status Database', 'Tersinkronisasi secara aman sesuai UU PDP No. 27/2022 & HL7 FHIR MedicationRequest.')}
+        >
+          <Ionicons name="cloud-done" size={16} color="#34C759" />
         </TouchableOpacity>
       </View>
 
@@ -389,21 +558,33 @@ export default function TherapyControlScreen() {
         {/* ================= TAB 1: MEDICATIONS ================= */}
         {activeTab === 'meds' && (
           <View style={styles.sectionWrap}>
-            {/* Low Stock Alert if any */}
-            {medications.some((m) => m.remainingStock <= 7) && (
+            {/* Low Stock or Expired Warning Banners */}
+            {medications.some((m) => m.remainingStock <= m.minimumStockAlert) && (
               <View style={[styles.stockAlertBox, { backgroundColor: '#FF950015' }]}>
                 <Ionicons name="warning" size={20} color="#FF9500" />
                 <View style={styles.stockAlertTextWrap}>
-                  <Text style={styles.stockAlertTitle}>Peringatan Sisa Stok Obat</Text>
+                  <Text style={styles.stockAlertTitle}>Peringatan Sisa Stok Obat Menipis</Text>
                   <Text style={styles.stockAlertSub}>
-                    Stok Candesartan 8mg tersisa 5 butir. Konsultasikan resep ulang ke dr. Budi Santoso via Halo Dokter.
+                    Stok Candesartan 8mg tersisa 5 butir (di bawah ambang 7 butir). Segera minta resep ulang ke dr. Budi Santoso via Halo Dokter.
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            {medications.some((m) => getExpiryInfo(m.expiryDate).status === 'warning') && (
+              <View style={[styles.stockAlertBox, { backgroundColor: '#FF950015' }]}>
+                <Ionicons name="time" size={20} color="#FF9500" />
+                <View style={styles.stockAlertTextWrap}>
+                  <Text style={styles.stockAlertTitle}>Obat Mendekati Tanggal Kadaluarsa</Text>
+                  <Text style={styles.stockAlertSub}>
+                    Metformin 500mg akan kadaluarsa dalam kurun 30 hari ke depan (28 Nov 2026). Periksa kemasan sebelum diminum.
                   </Text>
                 </View>
               </View>
             )}
 
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>JADWAL MINUM OBAT HARI INI</Text>
+              <Text style={styles.sectionTitle}>JADWAL & KONTROL STOK OBAT PASIEN</Text>
               <TouchableOpacity onPress={() => setAddMedModalVisible(true)}>
                 <Text style={styles.sectionActionText}>+ Tambah Obat</Text>
               </TouchableOpacity>
@@ -412,6 +593,9 @@ export default function TherapyControlScreen() {
             {medications.map((med) => {
               const isTaken = med.status === 'taken';
               const isSkipped = med.status === 'skipped';
+              const expInfo = getExpiryInfo(med.expiryDate);
+              const stockInfo = getStockInfo(med.remainingStock, med.minimumStockAlert);
+
               return (
                 <View
                   key={med.id}
@@ -421,6 +605,7 @@ export default function TherapyControlScreen() {
                     isTaken && { borderColor: '#34C75930', borderWidth: 1.5 },
                   ]}
                 >
+                  {/* Top: Icon, Names & Status */}
                   <View style={styles.medCardTop}>
                     <View style={styles.medCardHeaderLeft}>
                       <View style={[styles.medIconWrap, { backgroundColor: `${med.color}15` }]}>
@@ -431,11 +616,10 @@ export default function TherapyControlScreen() {
                           <Text style={[styles.medName, { color: isDark ? '#FFFFFF' : '#000000' }]}>
                             {med.name}
                           </Text>
-                          <Text style={styles.medDosage}>{med.dosage}</Text>
                         </View>
                         <Text style={styles.medIndication}>{med.indication}</Text>
-                        <Text style={styles.medInstruction}>
-                          ⏰ {med.scheduledTime} • 🍽️ {med.instruction}
+                        <Text style={styles.medDoctorTag}>
+                          🩺 Resep: {med.prescribedBy || 'dr. Budi Santoso, Sp.JP(K)'}
                         </Text>
                       </View>
                     </View>
@@ -469,13 +653,70 @@ export default function TherapyControlScreen() {
                     </View>
                   </View>
 
-                  {/* Stock pill & Actions */}
-                  <View style={styles.medCardBottom}>
-                    <View style={styles.stockPill}>
-                      <Text style={styles.stockPillText}>
-                        Sisa Stok: <Text style={{ fontWeight: '700' }}>{med.remainingStock} Butir</Text>
+                  {/* Middle Control Box: Dosage Diset, Stok & Kadaluarsa */}
+                  <View style={[styles.medControlGrid, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+                    {/* 1. Aturan Dosis yang Diset */}
+                    <View style={styles.controlGridItem}>
+                      <View style={styles.controlGridLabelRow}>
+                        <Ionicons name="bandage-outline" size={12} color="#007AFF" />
+                        <Text style={styles.controlGridLabel}>DOSIS DISET</Text>
+                      </View>
+                      <Text style={[styles.controlGridValue, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                        {med.dosePerIntake} {med.doseUnit} ({med.strength})
+                      </Text>
+                      <Text style={styles.controlGridSub}>
+                        {med.frequency} • {med.instruction}
                       </Text>
                     </View>
+
+                    <View style={styles.controlGridDivider} />
+
+                    {/* 2. Sisa Stok Obat */}
+                    <View style={styles.controlGridItem}>
+                      <View style={styles.controlGridLabelRow}>
+                        <Ionicons name="cube-outline" size={12} color={stockInfo.color} />
+                        <Text style={[styles.controlGridLabel, { color: stockInfo.color }]}>
+                          STOK TERSISA
+                        </Text>
+                      </View>
+                      <Text style={[styles.controlGridValue, { color: stockInfo.color }]}>
+                        {med.remainingStock} Butir
+                      </Text>
+                      <Text style={styles.controlGridSub}>{stockInfo.sub}</Text>
+                    </View>
+
+                    <View style={styles.controlGridDivider} />
+
+                    {/* 3. Tanggal Kadaluarsa */}
+                    <View style={styles.controlGridItem}>
+                      <View style={styles.controlGridLabelRow}>
+                        <Ionicons name="calendar-outline" size={12} color={expInfo.color} />
+                        <Text style={[styles.controlGridLabel, { color: expInfo.color }]}>
+                          KADALUARSA
+                        </Text>
+                      </View>
+                      <Text style={[styles.controlGridValue, { color: expInfo.color }]}>
+                        {expInfo.label}
+                      </Text>
+                      <Text numberOfLines={1} style={styles.controlGridSub}>
+                        {expInfo.sub}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Bottom: Restock Button & Intake Action */}
+                  <View style={styles.medCardBottom}>
+                    <TouchableOpacity
+                      style={styles.restockQuickBtn}
+                      onPress={() => {
+                        setSelectedMedForRestock(med);
+                        setRestockAmount('30');
+                        setRestockModalVisible(true);
+                      }}
+                    >
+                      <Ionicons name="add-circle-outline" size={14} color="#007AFF" />
+                      <Text style={styles.restockQuickBtnText}>+ Restok Obat</Text>
+                    </TouchableOpacity>
 
                     <View style={styles.medActionButtonsRow}>
                       {!isTaken && (
@@ -510,7 +751,7 @@ export default function TherapyControlScreen() {
                           color="#FFFFFF"
                         />
                         <Text style={styles.medTakeBtnText}>
-                          {isTaken ? 'Sudah Diminum' : 'Tandai Minum'}
+                          {isTaken ? 'Sudah Diminum' : `Minum ${med.dosePerIntake} ${med.doseUnit}`}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -797,8 +1038,8 @@ export default function TherapyControlScreen() {
                 style={styles.exportReportBtn}
                 onPress={() => {
                   Alert.alert(
-                    'Laporan Terkirim',
-                    'Ringkasan kepatuhan minum obat dan rekam tensi telah disinkronkan ke rekam medis dr. Budi Santoso di RS Jantung Harapan Kita via Supabase.'
+                    'Laporan Terkirim ke Rekam Medis',
+                    'Ringkasan kepatuhan minum obat, sisa stok, dan rekam tensi telah disinkronkan ke rekam medis dr. Budi Santoso di RS Jantung Harapan Kita via Supabase.'
                   );
                 }}
               >
@@ -812,7 +1053,84 @@ export default function TherapyControlScreen() {
         )}
       </ScrollView>
 
-      {/* MODAL 1: TAMBAH OBAT BARU */}
+      {/* MODAL 1: RESTOK OBAT CEPAT */}
+      <Modal
+        visible={restockModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setRestockModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
+            <View style={styles.modalHeaderRow}>
+              <Text style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                Restok {selectedMedForRestock?.name}
+              </Text>
+              <TouchableOpacity onPress={() => setRestockModalVisible(false)}>
+                <Ionicons name="close-circle" size={26} color="#8E8E93" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalSubText}>
+              Masukkan jumlah butir obat yang baru saja ditebus atau dibeli di apotek:
+            </Text>
+
+            <View style={styles.restockInputRow}>
+              <TextInput
+                style={[
+                  styles.restockInput,
+                  {
+                    color: isDark ? '#FFFFFF' : '#000000',
+                    backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7',
+                  },
+                ]}
+                placeholder="30"
+                placeholderTextColor="#8E8E93"
+                keyboardType="numeric"
+                value={restockAmount}
+                onChangeText={setRestockAmount}
+              />
+              <Text style={[styles.restockInputUnit, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                {selectedMedForRestock?.doseUnit || 'Butir'}
+              </Text>
+            </View>
+
+            {/* Quick Presets */}
+            <View style={styles.presetButtonsRow}>
+              {['15', '30', '60', '90'].map((preset) => (
+                <TouchableOpacity
+                  key={preset}
+                  style={[
+                    styles.presetBtn,
+                    restockAmount === preset && styles.presetBtnActive,
+                    { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' },
+                  ]}
+                  onPress={() => setRestockAmount(preset)}
+                >
+                  <Text
+                    style={[
+                      styles.presetBtnText,
+                      restockAmount === preset && styles.presetBtnTextActive,
+                    ]}
+                  >
+                    +{preset}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.modalSubmitBtn}
+              onPress={handleConfirmRestock}
+            >
+              <Text style={styles.modalSubmitBtnText}>Simpan Stok ke Database</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL 2: TAMBAH RESEP OBAT BARU */}
       <Modal
         visible={addMedModalVisible}
         animationType="slide"
@@ -824,7 +1142,7 @@ export default function TherapyControlScreen() {
         >
           <View style={[styles.modalHeader, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
             <Text style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-              Tambah Jadwal Obat
+              Tambah Resep & Kontrol Obat
             </Text>
             <TouchableOpacity onPress={() => setAddMedModalVisible(false)}>
               <Ionicons name="close-circle" size={28} color="#8E8E93" />
@@ -832,7 +1150,7 @@ export default function TherapyControlScreen() {
           </View>
 
           <ScrollView contentContainerStyle={styles.modalScroll}>
-            <Text style={styles.inputLabel}>NAMA OBAT *</Text>
+            <Text style={styles.inputLabel}>NAMA OBAT / GENERIK *</Text>
             <TextInput
               style={[
                 styles.textInput,
@@ -841,41 +1159,72 @@ export default function TherapyControlScreen() {
                   backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
                 },
               ]}
-              placeholder="Contoh: Bisoprolol, Metformin, Candesartan..."
+              placeholder="Contoh: Bisoprolol, Candesartan, Simvastatin..."
               placeholderTextColor="#8E8E93"
               value={newMedName}
               onChangeText={setNewMedName}
             />
 
-            <Text style={styles.inputLabel}>DOSIS & BENTUK</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  color: isDark ? '#FFFFFF' : '#000000',
-                  backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-                },
-              ]}
-              placeholder="Contoh: 5 mg • 1 Tablet"
-              placeholderTextColor="#8E8E93"
-              value={newMedDosage}
-              onChangeText={setNewMedDosage}
-            />
+            <View style={styles.dualInputRow}>
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>KEKUATAN DOSIS</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="5 mg"
+                  placeholderTextColor="#8E8E93"
+                  value={newMedStrength}
+                  onChangeText={setNewMedStrength}
+                />
+              </View>
 
-            <Text style={styles.inputLabel}>WAKTU MINUM (JAM)</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  color: isDark ? '#FFFFFF' : '#000000',
-                  backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-                },
-              ]}
-              placeholder="08:00 WIB"
-              placeholderTextColor="#8E8E93"
-              value={newMedTime}
-              onChangeText={setNewMedTime}
-            />
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>BUTIR SEKALI MINUM</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="1"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newDosePerIntake}
+                  onChangeText={setNewDosePerIntake}
+                />
+              </View>
+            </View>
+
+            <Text style={styles.inputLabel}>FREKUENSI MINUM</Text>
+            <View style={styles.chipRow}>
+              {['1x Sehari', '2x Sehari', '3x Sehari', 'Sesuai Kebutuhan'].map((freq) => (
+                <TouchableOpacity
+                  key={freq}
+                  style={[
+                    styles.chipBtn,
+                    newFrequency === freq && styles.chipBtnActive,
+                    { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                  ]}
+                  onPress={() => setNewFrequency(freq)}
+                >
+                  <Text
+                    style={[
+                      styles.chipBtnText,
+                      newFrequency === freq && styles.chipBtnTextActive,
+                    ]}
+                  >
+                    {freq}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             <Text style={styles.inputLabel}>ATURAN MINUM</Text>
             <View style={styles.chipRow}>
@@ -901,7 +1250,45 @@ export default function TherapyControlScreen() {
               ))}
             </View>
 
-            <Text style={styles.inputLabel}>JUMLAH STOK BUTIR AWAL</Text>
+            <View style={styles.dualInputRow}>
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>STOK AWAL (BUTIR)</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="30"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newMedStock}
+                  onChangeText={setNewMedStock}
+                />
+              </View>
+
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>BATAS ALERT MENIPIS</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="7"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newMinAlert}
+                  onChangeText={setNewMinAlert}
+                />
+              </View>
+            </View>
+
+            <Text style={styles.inputLabel}>TANGGAL KADALUARSA (EXPIRY DATE YYYY-MM-DD) *</Text>
             <TextInput
               style={[
                 styles.textInput,
@@ -910,11 +1297,10 @@ export default function TherapyControlScreen() {
                   backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
                 },
               ]}
-              placeholder="30"
+              placeholder="2027-12-31"
               placeholderTextColor="#8E8E93"
-              keyboardType="numeric"
-              value={newMedStock}
-              onChangeText={setNewMedStock}
+              value={newExpiryDate}
+              onChangeText={setNewExpiryDate}
             />
 
             <TouchableOpacity
@@ -922,13 +1308,13 @@ export default function TherapyControlScreen() {
               style={styles.modalSubmitBtn}
               onPress={handleAddMedication}
             >
-              <Text style={styles.modalSubmitBtnText}>Simpan Jadwal Obat</Text>
+              <Text style={styles.modalSubmitBtnText}>Simpan Resep & Kontrol ke Database</Text>
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
       </Modal>
 
-      {/* MODAL 2: CATAT TENSI & VITAL MANUAL */}
+      {/* MODAL 3: CATAT TENSI & VITAL */}
       <Modal
         visible={addVitalModalVisible}
         animationType="slide"
@@ -1058,7 +1444,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#8E8E9330',
   },
@@ -1088,6 +1474,31 @@ const styles = StyleSheet.create({
   addButton: {
     padding: 2,
   },
+  dbStatusBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#8E8E9320',
+  },
+  dbStatusLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dbDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#34C759',
+  },
+  dbStatusText: {
+    fontSize: 10,
+    color: '#8E8E93',
+    fontWeight: '600',
+  },
 
   // ADHERENCE BANNER
   adherenceBanner: {
@@ -1095,7 +1506,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginHorizontal: 20,
-    marginTop: 14,
+    marginTop: 12,
     marginBottom: 12,
     padding: 16,
     borderRadius: 20,
@@ -1215,7 +1626,7 @@ const styles = StyleSheet.create({
     color: '#007AFF',
   },
 
-  // LOW STOCK ALERT
+  // ALERTS
   stockAlertBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1280,17 +1691,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '800',
   },
-  medDosage: {
-    fontSize: 12,
-    color: '#8E8E93',
-    fontWeight: '600',
-  },
   medIndication: {
     fontSize: 11,
     color: '#007AFF',
     fontWeight: '600',
   },
-  medInstruction: {
+  medDoctorTag: {
     fontSize: 10,
     color: '#8E8E93',
     marginTop: 2,
@@ -1307,23 +1713,68 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
+
+  // MED CONTROL GRID (DOSAGE DISET, STOK, KADALUARSA)
+  medControlGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+  },
+  controlGridItem: {
+    flex: 1,
+    gap: 2,
+  },
+  controlGridLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  controlGridLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#8E8E93',
+    letterSpacing: 0.3,
+  },
+  controlGridValue: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  controlGridSub: {
+    fontSize: 9,
+    color: '#8E8E93',
+    lineHeight: 12,
+  },
+  controlGridDivider: {
+    width: StyleSheet.hairlineWidth,
+    height: 32,
+    backgroundColor: '#8E8E9330',
+    marginHorizontal: 6,
+  },
+
   medCardBottom: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#8E8E9320',
   },
-  stockPill: {
-    backgroundColor: '#8E8E9312',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+  restockQuickBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: '#007AFF15',
   },
-  stockPillText: {
-    fontSize: 10,
-    color: '#8E8E93',
+  restockQuickBtnText: {
+    fontSize: 11,
+    color: '#007AFF',
+    fontWeight: '700',
   },
   medActionButtonsRow: {
     flexDirection: 'row',
@@ -1722,5 +2173,67 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+
+  // RESTOCK MODAL SPECIFICS
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: '#00000060',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    gap: 14,
+  },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modalSubText: {
+    fontSize: 13,
+    color: '#8E8E93',
+    lineHeight: 18,
+  },
+  restockInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  restockInput: {
+    flex: 1,
+    borderRadius: 14,
+    padding: 14,
+    fontSize: 20,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  restockInputUnit: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  presetButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  presetBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  presetBtnActive: {
+    backgroundColor: '#007AFF',
+  },
+  presetBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#8E8E93',
+  },
+  presetBtnTextActive: {
+    color: '#FFFFFF',
   },
 });

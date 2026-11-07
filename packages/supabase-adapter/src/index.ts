@@ -8,4 +8,5 @@ export * from './questionnaire-service.ts';
 export * from './consent-service.ts';
 export * from './appointment-service.ts';
 export * from './research-service.ts';
+export * from './medication-service.ts';
 
