@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { SupabaseBadge } from '../../../components/SupabaseBadge';
 import {
   Heart,
   Activity,
@@ -42,6 +43,7 @@ export default function PatientDashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+            <SupabaseBadge />
             <Link
               href="/dashboard/patient/observations"
               className="text-xs bg-sky-600 hover:bg-sky-500 text-white font-medium px-3 py-1.5 rounded-lg shadow-xs transition"
@@ -343,30 +345,74 @@ export default function PatientDashboard() {
 
         {activeTab === 'devices' && (
           <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Connected Devices & Wearables</h3>
-            <p className="text-xs text-slate-500 mb-6">Manage data sharing permissions and sync frequency.</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Connected Devices & Wearable Sensors</h3>
+                <p className="text-xs text-slate-500">
+                  Data disinkronkan otomatis dari Stanford Spezi Mobile App melalui Apple HealthKit, Android Health Connect, dan BLE.
+                </p>
+              </div>
+              <span className="px-3 py-1 bg-sky-50 border border-sky-200 text-sky-800 rounded-full text-xs font-semibold">
+                FHIR R4 Telemetry Gateway
+              </span>
+            </div>
+
+            {/* Architecture Explainer Card */}
+            <div className="p-4 bg-gradient-to-r from-sky-50 to-indigo-50 border border-sky-200 rounded-xl mb-6 text-xs text-slate-700 leading-relaxed">
+              <strong className="text-slate-900 font-semibold block mb-1">
+                Alur Integrasi Mobile App & Wearable ke Web Portal:
+              </strong>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                <div className="p-3 bg-white rounded-lg border border-sky-100 shadow-xs">
+                  <div className="font-bold text-sky-700 mb-1">1. Wearable Sensors</div>
+                  <div>Apple Watch, Galaxy Watch, & Tensimeter BLE membaca denyut nadi, SpO2, dan tekanan darah.</div>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-sky-100 shadow-xs">
+                  <div className="font-bold text-indigo-700 mb-1">2. Spezi Mobile App</div>
+                  <div>Aplikasi ponsel menstandarkan data ke kode LOINC & UCUM, lalu menyimpannya di Supabase.</div>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-sky-100 shadow-xs">
+                  <div className="font-bold text-emerald-700 mb-1">3. Web Portal (Realtime)</div>
+                  <div>Dokter dan Pasien dapat melihat grafik tren vital dan Clinical Decision Support secara langsung.</div>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-800">
                     <Smartphone className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900">Apple HealthKit (iPhone & Apple Watch)</div>
-                    <div className="text-xs text-slate-500">Active background sync: Heart Rate, Sleep, Steps, SpO2</div>
+                    <div className="font-semibold text-slate-900">Apple HealthKit (iOS & Apple Watch)</div>
+                    <div className="text-xs text-slate-500">Continuous telemetry: Heart Rate (LOINC 8867-4), SpO2 (59408-5), Steps</div>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Connected</span>
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-800">
-                    <Heart className="w-6 h-6 text-rose-500" />
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-emerald-700">
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-900">Android Health Connect (WearOS / Galaxy Watch)</div>
+                    <div className="text-xs text-slate-500">Google Health Connect API: Resting HR, Sleep Architecture, Blood Glucose</div>
+                  </div>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Active Sync</span>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-rose-500">
+                    <Heart className="w-6 h-6" />
                   </div>
                   <div>
                     <div className="font-semibold text-slate-900">Omron Bluetooth Blood Pressure Monitor</div>
-                    <div className="text-xs text-slate-500">BLE GATT Profile (Systolic, Diastolic, Pulse)</div>
+                    <div className="text-xs text-slate-500">Direct BLE GATT Profile: Systolic & Diastolic BP (LOINC 85354-9)</div>
                   </div>
                 </div>
                 <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Paired</span>
