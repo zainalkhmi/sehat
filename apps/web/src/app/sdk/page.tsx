@@ -27,6 +27,14 @@ import {
   Sliders,
   CheckCircle2,
   AlertTriangle,
+  Eye,
+  FileText,
+  User,
+  Stethoscope,
+  Pill,
+  Clock,
+  Send,
+  Sparkles,
 } from 'lucide-react';
 import { SupabaseBadge } from '@/components/SupabaseBadge';
 
@@ -40,7 +48,7 @@ interface FHIRResource {
   display: string;
   subject: string;
   effectiveDateTime: string;
-  rawJson: object;
+  rawJson: any;
 }
 
 const SAMPLE_RESOURCES: FHIRResource[] = [
@@ -52,7 +60,7 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
     code: '85354-9',
     display: 'Blood Pressure Panel (103/64 mmHg, 62 BPM)',
     subject: 'Patient/P-88219 (Zainal)',
-    effectiveDateTime: '2026-11-07T08:15:00 WIB',
+    effectiveDateTime: 'Hari Ini, 08:15 WIB',
     rawJson: {
       resourceType: 'Observation',
       id: 'obs-bp-88219',
@@ -70,7 +78,7 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
       ],
       code: {
         coding: [{ system: 'http://loinc.org', code: '85354-9', display: 'Blood pressure panel' }],
-        text: 'Blood Pressure',
+        text: 'Blood Pressure Panel',
       },
       subject: { reference: 'Patient/P-88219', display: 'Zainal' },
       effectiveDateTime: '2026-11-07T08:15:00+07:00',
@@ -82,6 +90,10 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
         {
           code: { coding: [{ system: 'http://loinc.org', code: '8462-4', display: 'Diastolic blood pressure' }] },
           valueQuantity: { value: 64, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' },
+        },
+        {
+          code: { coding: [{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }] },
+          valueQuantity: { value: 62, unit: 'BPM', system: 'http://unitsofmeasure.org', code: '/min' },
         },
       ],
       device: { display: 'Omron BP5250 Upper Arm Cuff (BLE)' },
@@ -95,7 +107,7 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
     code: '59408-5',
     display: 'Oxygen Saturation SpO2 (98 %)',
     subject: 'Patient/P-88219 (Zainal)',
-    effectiveDateTime: '2026-11-07T08:15:00 WIB',
+    effectiveDateTime: 'Hari Ini, 08:15 WIB',
     rawJson: {
       resourceType: 'Observation',
       id: 'obs-spo2-88220',
@@ -103,7 +115,7 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
       code: {
         coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation in Arterial blood' }],
       },
-      subject: { reference: 'Patient/P-88219' },
+      subject: { reference: 'Patient/P-88219', display: 'Zainal' },
       valueQuantity: { value: 98, unit: '%', system: 'http://unitsofmeasure.org', code: '%' },
       device: { display: 'Apple Watch Series 9 (HealthKit)' },
     },
@@ -116,7 +128,7 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
     code: 'KFA-93001882',
     display: 'Amlodipine Besylate 5 mg (1x Sehari)',
     subject: 'Patient/P-88219 (Zainal)',
-    effectiveDateTime: '2026-11-01 s/d 2026-11-30',
+    effectiveDateTime: '1 Nov s/d 30 Nov 2026',
     rawJson: {
       resourceType: 'MedicationRequest',
       id: 'medreq-amlodipine-01',
@@ -126,13 +138,13 @@ const SAMPLE_RESOURCES: FHIRResource[] = [
         coding: [
           { system: 'http://sys-ids.kemkes.go.id/kfa', code: '93001882', display: 'Amlodipine Besylate 5 mg Tablet' },
         ],
-        text: 'Amlodipine 5 mg',
+        text: 'Amlodipine Besylate 5 mg',
       },
-      subject: { reference: 'Patient/P-88219' },
+      subject: { reference: 'Patient/P-88219', display: 'Zainal' },
       requester: { reference: 'Practitioner/dr-budi-santoso', display: 'dr. Budi Santoso, Sp.JP(K)' },
       dosageInstruction: [
         {
-          text: '1 Tablet Sesudah Makan Pagi',
+          text: '1 Tablet Sesudah Makan Pagi (1x Sehari)',
           timing: { repeat: { frequency: 1, period: 1, periodUnit: 'd' } },
         },
       ],
@@ -192,13 +204,30 @@ export default function SDKConsolePage() {
   const [selectedResourceType, setSelectedResourceType] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [inspectingResource, setInspectingResource] = useState<FHIRResource>(SAMPLE_RESOURCES[0]);
+  const [explorerViewMode, setExplorerViewMode] = useState<'visual' | 'code'>('visual'); // Default: VISUAL FORM!
   const [copiedJson, setCopiedJson] = useState(false);
 
   // Playground States
   const [httpMethod, setHttpMethod] = useState<'GET' | 'POST' | 'PUT'>('GET');
   const [queryEndpoint, setQueryEndpoint] = useState('/Observation?patient=P-88219&_sort=-date');
   const [isExecuting, setIsExecuting] = useState(false);
-  const [queryResponse, setQueryResponse] = useState<string | null>(null);
+  const [queryResponse, setQueryResponse] = useState<string | null>(
+    JSON.stringify(
+      {
+        resourceType: 'Bundle',
+        type: 'searchset',
+        total: 2,
+        meta: { lastUpdated: new Date().toISOString() },
+        entry: SAMPLE_RESOURCES.filter((r) => r.resourceType === 'Observation').map((r) => ({
+          fullUrl: `https://api.futurehealth.care/fhir/R4/${r.resourceType}/${r.id}`,
+          resource: r.rawJson,
+        })),
+      },
+      null,
+      2
+    )
+  );
+  const [playgroundViewMode, setPlaygroundViewMode] = useState<'visual' | 'code'>('visual'); // Default: VISUAL DASHBOARD!
 
   // Copy helper
   const handleCopy = (text: string) => {
@@ -210,8 +239,6 @@ export default function SDKConsolePage() {
   // Run Query in Playground
   const handleRunQuery = () => {
     setIsExecuting(true);
-    setQueryResponse(null);
-
     setTimeout(() => {
       setIsExecuting(false);
       setQueryResponse(
@@ -230,7 +257,7 @@ export default function SDKConsolePage() {
           2
         )
       );
-    }, 600);
+    }, 500);
   };
 
   const filteredResources = SAMPLE_RESOURCES.filter((res) => {
@@ -288,14 +315,14 @@ export default function SDKConsolePage() {
           <div>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold mb-2">
               <Code2 className="w-3.5 h-3.5" />
-              <span>Like Medplum • HL7 FHIR R4 • React UI SDK • Medplum Bots</span>
+              <span>Like Medplum • HL7 FHIR R4 • React UI SDK • Visual Clinical Forms</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
               Developer SDK & Clinical Telemetry Console
             </h1>
             <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-              Inspect raw clinical resources, test FHIR queries, automate alerts with Medplum Bots, and integrate
-              modular UI widgets into cross-platform web and mobile health apps.
+              Inspect clinical resources in rich UI or raw code, test live FHIR queries, automate alerts with Medplum Bots,
+              and integrate modular UI widgets into web and mobile health apps.
             </p>
           </div>
 
@@ -322,7 +349,7 @@ export default function SDKConsolePage() {
         <div className="max-w-7xl mx-auto mt-6 flex space-x-1 border-b border-slate-800">
           {[
             { id: 'explorer', label: 'Resource Explorer', icon: Layers },
-            { id: 'playground', label: 'API Playground (REST / GraphQL)', icon: Terminal },
+            { id: 'playground', label: 'API Playground (Visual & REST)', icon: Terminal },
             { id: 'bots', label: 'Clinical Bots & Automation', icon: Bot },
             { id: 'components', label: 'React UI SDK Showcase', icon: FileCode },
             { id: 'auth', label: 'SMART on FHIR & Access Policies', icon: ShieldCheck },
@@ -353,7 +380,7 @@ export default function SDKConsolePage() {
         {activeTab === 'explorer' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left: Resource List & Filters */}
-            <div className="lg:col-span-7 space-y-4">
+            <div className="lg:col-span-6 space-y-4">
               {/* Filter and Search Bar */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
@@ -391,7 +418,7 @@ export default function SDKConsolePage() {
                   <span>Select to Inspect</span>
                 </div>
 
-                <div className="divide-y divide-slate-700/60">
+                <div className="divide-y divide-slate-700/60 max-h-[580px] overflow-y-auto">
                   {filteredResources.map((res) => {
                     const isSelected = inspectingResource.id === res.id;
                     return (
@@ -426,41 +453,231 @@ export default function SDKConsolePage() {
               </div>
             </div>
 
-            {/* Right: Live FHIR JSON Inspector Drawer */}
-            <div className="lg:col-span-5 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col h-[650px] shadow-2xl">
+            {/* Right: Rich Clinical UI Form & Code Toggle */}
+            <div className="lg:col-span-6 bg-slate-950 border border-slate-800 rounded-2xl p-5 flex flex-col h-[650px] shadow-2xl">
+              {/* Header with Mode Switcher (Visual vs Code) */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-2">
-                  <FileCode className="w-4 h-4 text-sky-400" />
-                  <span className="text-sm font-bold text-white">FHIR R4 JSON Schema Viewer</span>
+                  <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                    <button
+                      onClick={() => setExplorerViewMode('visual')}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                        explorerViewMode === 'visual'
+                          ? 'bg-sky-600 text-white shadow'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Visual Form</span>
+                    </button>
+                    <button
+                      onClick={() => setExplorerViewMode('code')}
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                        explorerViewMode === 'code'
+                          ? 'bg-sky-600 text-white shadow'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Code2 className="w-3.5 h-3.5" />
+                      <span>Raw JSON</span>
+                    </button>
+                  </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleCopy(JSON.stringify(inspectingResource.rawJson, null, 2))}
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors"
                   >
                     {copiedJson ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedJson ? 'Copied' : 'Copy JSON'}</span>
+                    <span>{copiedJson ? 'Copied' : 'Copy'}</span>
                   </button>
-                  <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
                     VALID R4
                   </span>
                 </div>
               </div>
 
-              {/* Resource Summary */}
-              <div className="py-3 text-xs border-b border-slate-800/80 space-y-1">
-                <p className="text-slate-400">
-                  Resource: <span className="text-sky-400 font-mono">{inspectingResource.resourceType}/{inspectingResource.id}</span>
-                </p>
-                <p className="text-slate-400">
-                  Last Updated: <span className="text-slate-200">{inspectingResource.meta.lastUpdated}</span>
-                </p>
-              </div>
+              {/* View 1: RICH CLINICAL FORM VIEW (Visual UI like Medplum App) */}
+              {explorerViewMode === 'visual' && (
+                <div className="flex-1 overflow-y-auto mt-4 space-y-4 pr-1">
+                  {/* Resource Badge Header */}
+                  <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center font-bold text-lg">
+                        {inspectingResource.resourceType === 'Observation'
+                          ? '🩺'
+                          : inspectingResource.resourceType === 'MedicationRequest'
+                          ? '💊'
+                          : inspectingResource.resourceType === 'Patient'
+                          ? '👤'
+                          : '⚙️'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 uppercase">
+                            {inspectingResource.resourceType}
+                          </span>
+                          <span className="text-xs font-mono text-slate-400">ID: {inspectingResource.id}</span>
+                        </div>
+                        <h3 className="text-base font-bold text-white mt-0.5">{inspectingResource.display}</h3>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      {inspectingResource.status.toUpperCase()}
+                    </span>
+                  </div>
 
-              {/* Raw JSON viewer */}
-              <div className="flex-1 overflow-auto mt-3 rounded-xl bg-slate-900/90 p-4 font-mono text-xs text-sky-300 leading-relaxed border border-slate-800">
-                <pre>{JSON.stringify(inspectingResource.rawJson, null, 2)}</pre>
-              </div>
+                  {/* Context: Subject & Practitioner */}
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                      <span className="text-slate-400 block font-medium">Subjek / Pasien</span>
+                      <span className="text-white font-bold text-sm mt-0.5 block">
+                        {inspectingResource.subject}
+                      </span>
+                    </div>
+                    <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+                      <span className="text-slate-400 block font-medium">Waktu Efektif</span>
+                      <span className="text-sky-300 font-semibold mt-0.5 block">
+                        {inspectingResource.effectiveDateTime}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Resource Type Specific Visual Panels */}
+                  {inspectingResource.resourceType === 'Observation' && (
+                    <div className="space-y-3">
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">
+                          Hasil Pengukuran Hemodinamik & Vital
+                        </span>
+
+                        {inspectingResource.rawJson.component ? (
+                          <div className="grid grid-cols-3 gap-3">
+                            {inspectingResource.rawJson.component.map((comp: any, idx: number) => (
+                              <div key={idx} className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-3 text-center">
+                                <span className="text-[11px] text-slate-400 block truncate">
+                                  {comp.code?.text || comp.code?.coding?.[0]?.display}
+                                </span>
+                                <span className="text-2xl font-black text-white mt-1 block">
+                                  {comp.valueQuantity?.value}
+                                </span>
+                                <span className="text-xs font-semibold text-sky-400">
+                                  {comp.valueQuantity?.unit}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-4 text-center">
+                            <span className="text-xs text-slate-400 block">Nilai Saturasi</span>
+                            <span className="text-3xl font-black text-emerald-400 mt-1 block">
+                              {inspectingResource.rawJson.valueQuantity?.value}{' '}
+                              {inspectingResource.rawJson.valueQuantity?.unit}
+                            </span>
+                            <span className="text-xs text-slate-300 mt-1 block">
+                              Status: Room Air (Udara Bebas Terkontrol)
+                            </span>
+                          </div>
+                        )}
+
+                        {inspectingResource.rawJson.device && (
+                          <div className="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                            <span>Perangkat Asal:</span>
+                            <span className="font-semibold text-sky-400">
+                              {inspectingResource.rawJson.device.display}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {inspectingResource.resourceType === 'MedicationRequest' && (
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                        Detail Resep & Kontrol Obat Pasien
+                      </span>
+                      <div className="flex items-center justify-between p-3 bg-slate-800/80 rounded-xl">
+                        <div>
+                          <p className="text-sm font-bold text-white">
+                            {inspectingResource.rawJson.medicationCodeableConcept?.text}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {inspectingResource.rawJson.dosageInstruction?.[0]?.text}
+                          </p>
+                        </div>
+                        <span className="text-xs px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300 font-bold">
+                          KFA Verified
+                        </span>
+                      </div>
+
+                      {/* Stock Progress */}
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-slate-400">Sisa Stok Terkendali:</span>
+                          <span className="text-emerald-400 font-bold">24 dari 30 Tablet (80%)</span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className="h-full bg-emerald-500 w-[80%]" />
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800 text-xs flex justify-between text-slate-400">
+                        <span>DPJP Pembuat Resep:</span>
+                        <span className="text-sky-300 font-semibold">
+                          {inspectingResource.rawJson.requester?.display}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {inspectingResource.resourceType === 'Patient' && (
+                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                        Demografi Pasien Terverifikasi Kemenkes
+                      </span>
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div className="bg-slate-800/60 p-3 rounded-lg">
+                          <span className="text-slate-400">NIK KTP</span>
+                          <span className="text-white font-mono font-bold block mt-1">317102882190001</span>
+                        </div>
+                        <div className="bg-slate-800/60 p-3 rounded-lg">
+                          <span className="text-slate-400">IHS Number (SatuSehat)</span>
+                          <span className="text-sky-300 font-mono font-bold block mt-1">10000004218</span>
+                        </div>
+                      </div>
+                      <div className="p-3 bg-slate-800/60 rounded-lg text-xs flex justify-between">
+                        <span className="text-slate-400">Tanggal Lahir / Usia</span>
+                        <span className="text-white font-semibold">15 Juni 1984 (42 Tahun)</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions Row */}
+                  <div className="pt-2 flex gap-2">
+                    <button
+                      onClick={() => alert('Data telemetri berhasil divalidasi ke format FHIR R4 & Supabase.')}
+                      className="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow transition-all"
+                    >
+                      Validasi & Sinkronisasi Ulang
+                    </button>
+                    <button
+                      onClick={() => setExplorerViewMode('code')}
+                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                    >
+                      Lihat Raw JSON
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* View 2: RAW CODE JSON VIEW */}
+              {explorerViewMode === 'code' && (
+                <div className="flex-1 overflow-auto mt-3 rounded-xl bg-slate-900/90 p-4 font-mono text-xs text-sky-300 leading-relaxed border border-slate-800">
+                  <pre>{JSON.stringify(inspectingResource.rawJson, null, 2)}</pre>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -474,7 +691,7 @@ export default function SDKConsolePage() {
                 <span>FHIR REST & Batch Query Console</span>
               </h2>
               <p className="text-sm text-slate-400 mb-6">
-                Test standard HL7 FHIR search parameters, compartment searches, and batch bundle operations directly.
+                Uji coba query pencarian standar HL7 FHIR, kompartemen observasi pasien, dan transaksi data secara real-time.
               </p>
 
               {/* URL Bar */}
@@ -507,18 +724,18 @@ export default function SDKConsolePage() {
                   className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-600/20 transition-all disabled:opacity-50"
                 >
                   {isExecuting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
-                  <span>Execute</span>
+                  <span>Jalankan Query</span>
                 </button>
               </div>
 
               {/* Quick Query Presets */}
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-slate-400">Presets:</span>
+                <span className="text-xs text-slate-400 font-semibold">Preset Medis:</span>
                 {[
-                  { label: 'Patient Vitals', url: '/Observation?patient=P-88219&category=vital-signs' },
-                  { label: 'Active Prescriptions', url: '/MedicationRequest?patient=P-88219&status=active' },
-                  { label: 'Connected Devices', url: '/Device?patient=P-88219' },
-                  { label: 'Everything ($everything)', url: '/Patient/P-88219/$everything' },
+                  { label: '🩺 Patient Vitals', url: '/Observation?patient=P-88219&category=vital-signs' },
+                  { label: '💊 Active Prescriptions', url: '/MedicationRequest?patient=P-88219&status=active' },
+                  { label: '📡 Connected Devices', url: '/Device?patient=P-88219' },
+                  { label: '⚡ Everything ($everything)', url: '/Patient/P-88219/$everything' },
                 ].map((preset) => (
                   <button
                     key={preset.label}
@@ -534,27 +751,149 @@ export default function SDKConsolePage() {
               </div>
             </div>
 
-            {/* Query Output */}
+            {/* Query Output: Dual View (VISUAL CLINICAL RESULTS vs RAW JSON) */}
             {queryResponse && (
               <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-xs">
+                  <div className="flex items-center gap-3">
+                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30">
                       200 OK
                     </span>
                     <span className="text-xs text-slate-400">Response Time: 34ms</span>
-                    <span className="text-xs text-slate-400">• Content-Type: application/fhir+json</span>
+                    <span className="text-xs text-slate-400 hidden sm:inline">• Content-Type: application/fhir+json</span>
                   </div>
-                  <button
-                    onClick={() => handleCopy(queryResponse)}
-                    className="text-xs text-sky-400 hover:text-sky-300 font-semibold"
-                  >
-                    Copy Output
-                  </button>
+
+                  {/* Visual vs Code Mode Switcher */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                      <button
+                        onClick={() => setPlaygroundViewMode('visual')}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                          playgroundViewMode === 'visual'
+                            ? 'bg-sky-600 text-white shadow'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Visual UI (Hasil Klinis)</span>
+                      </button>
+                      <button
+                        onClick={() => setPlaygroundViewMode('code')}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                          playgroundViewMode === 'code'
+                            ? 'bg-sky-600 text-white shadow'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        <Code2 className="w-3.5 h-3.5" />
+                        <span>Raw JSON Code</span>
+                      </button>
+                    </div>
+
+                    <button
+                      onClick={() => handleCopy(queryResponse)}
+                      className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-medium"
+                    >
+                      {copiedJson ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
                 </div>
-                <pre className="bg-slate-900/90 rounded-xl p-4 font-mono text-xs text-emerald-300 overflow-auto max-h-96">
-                  {queryResponse}
-                </pre>
+
+                {/* ================= OPTION 1: VISUAL CLINICAL RESULTS DASHBOARD ================= */}
+                {playgroundViewMode === 'visual' && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-sky-950/40 border border-sky-800/40 rounded-xl flex items-center justify-between text-xs">
+                      <span className="text-sky-300 font-semibold">
+                        Bundle Hasil: 2 Observasi Tanda Vital Terkini Ditemukan
+                      </span>
+                      <span className="text-slate-400">Tipe: Bundle (searchset)</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Card 1: Blood Pressure */}
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-colors">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">🩺</span>
+                            <div>
+                              <h4 className="text-sm font-bold text-white">Tekanan Darah & Nadi</h4>
+                              <p className="text-[11px] text-slate-400">LOINC 85354-9 • Blood Pressure Panel</p>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400">
+                            OPTIMAL (AHA 2017)
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 my-3 p-3 bg-slate-800/60 rounded-xl text-center">
+                          <div>
+                            <span className="text-[10px] text-slate-400 block">Sistolik</span>
+                            <span className="text-xl font-black text-white">103</span>
+                            <span className="text-[10px] text-sky-400 block">mmHg</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block">Diastolik</span>
+                            <span className="text-xl font-black text-white">64</span>
+                            <span className="text-[10px] text-sky-400 block">mmHg</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block">Denyut Nadi</span>
+                            <span className="text-xl font-black text-rose-400">62</span>
+                            <span className="text-[10px] text-slate-400 block">BPM</span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-slate-400 space-y-1 pt-2 border-t border-slate-800/80">
+                          <p>
+                            Pasien: <span className="text-slate-200 font-semibold">Zainal (ID: P-88219)</span>
+                          </p>
+                          <p>
+                            Alat: <span className="text-sky-300">Omron BP5250 Upper Arm Cuff (BLE)</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Card 2: SpO2 */}
+                      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-slate-700 transition-colors">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">💨</span>
+                            <div>
+                              <h4 className="text-sm font-bold text-white">Saturasi Oksigen (SpO2)</h4>
+                              <p className="text-[11px] text-slate-400">LOINC 59408-5 • Arterial Blood Oximetry</p>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400">
+                            NORMAL ROOM AIR
+                          </span>
+                        </div>
+
+                        <div className="my-3 p-4 bg-slate-800/60 rounded-xl text-center">
+                          <span className="text-3xl font-black text-emerald-400">98 %</span>
+                          <span className="text-xs text-slate-400 block mt-1">
+                            Oksigenasi Jaringan Sempurna (Rentang Aman: 95–100%)
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-slate-400 space-y-1 pt-2 border-t border-slate-800/80">
+                          <p>
+                            Pasien: <span className="text-slate-200 font-semibold">Zainal (ID: P-88219)</span>
+                          </p>
+                          <p>
+                            Perangkat: <span className="text-sky-300">Apple Watch Series 9 (HealthKit)</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ================= OPTION 2: RAW CODE JSON VIEW ================= */}
+                {playgroundViewMode === 'code' && (
+                  <pre className="bg-slate-900/90 rounded-xl p-4 font-mono text-xs text-emerald-300 overflow-auto max-h-96">
+                    {queryResponse}
+                  </pre>
+                )}
               </div>
             )}
           </div>
