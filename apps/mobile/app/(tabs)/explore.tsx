@@ -1,6 +1,8 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
@@ -42,10 +44,44 @@ export default function TabTwoScreen() {
           style={{
             fontFamily: Fonts.rounded,
           }}>
-          Explore
+          Clinical Research Modules
         </ThemedText>
       </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
+
+      {/* Stanford NAMS Feature Card */}
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => router.push('/nams')}
+        style={styles.namsFeatureCard}
+      >
+        <View style={styles.namsHeader}>
+          <View style={styles.namsIconWrap}>
+            <Ionicons name="hardware-chip" size={28} color="#FFFFFF" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={styles.namsBadgeRow}>
+              <View style={styles.namsPill}>
+                <ThemedText style={styles.namsPillText}>StanfordBDHG / NAMS</ThemedText>
+              </View>
+              <View style={styles.eegActivePill}>
+                <ThemedText style={styles.eegActiveText}>Muse & Biopot BLE</ThemedText>
+              </View>
+            </View>
+            <ThemedText style={styles.namsCardTitle}>
+              NeuroNest EEG & Neurodevelopment
+            </ThemedText>
+          </View>
+        </View>
+
+        <ThemedText style={styles.namsCardDesc}>
+          Live 4-channel frontal & temporal EEG acquisition (TP9, AF7, AF8, TP10), Theta/Beta Ratio biomarker, and FHIR milestone screening.
+        </ThemedText>
+
+        <View style={styles.namsCardFooter}>
+          <ThemedText style={styles.namsOpenText}>Launch NAMS Protocol</ThemedText>
+          <Ionicons name="arrow-forward-circle" size={22} color="#007AFF" />
+        </View>
+      </TouchableOpacity>
       <Collapsible title="File-based routing">
         <ThemedText>
           This app has two tabs:{' '}
@@ -135,5 +171,78 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  namsFeatureCard: {
+    backgroundColor: '#007AFF10',
+    borderRadius: 20,
+    padding: 18,
+    marginVertical: 14,
+    borderWidth: 1.5,
+    borderColor: '#007AFF30',
+  },
+  namsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 10,
+  },
+  namsIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  namsBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  namsPill: {
+    backgroundColor: '#007AFF20',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  namsPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  eegActivePill: {
+    backgroundColor: '#34C75920',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  eegActiveText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#34C759',
+  },
+  namsCardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  namsCardDesc: {
+    fontSize: 12,
+    lineHeight: 18,
+    opacity: 0.8,
+    marginBottom: 12,
+  },
+  namsCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#007AFF25',
+  },
+  namsOpenText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#007AFF',
   },
 });

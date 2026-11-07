@@ -48,6 +48,14 @@ const INITIAL_PAIRED: PairedDevice[] = [
 
 const SCAN_CATALOG: DiscoveredDevice[] = [
   {
+    id: 'scan-muse-s',
+    name: 'Muse S EEG Headband (Stanford NAMS)',
+    model: 'Muse S',
+    type: 'oximeter',
+    rssi: -48,
+    manufacturer: 'InteraXon / Stanford NAMS',
+  },
+  {
     id: 'scan-sc-150',
     name: 'Smart Body Composition Scale',
     model: 'SC-150',
