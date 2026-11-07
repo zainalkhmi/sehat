@@ -29,12 +29,22 @@ interface SixPackMenuItem {
 
 const SIX_PACK_MENU: SixPackMenuItem[] = [
   {
+    id: 'halo-dokter',
+    title: 'Halo Dokter',
+    subtitle: 'dr. Budi Santoso, Sp.JP • Telemedis',
+    icon: 'medkit',
+    color: '#007AFF',
+    bgColor: '#007AFF15',
+    badge: 'Online',
+    route: '/halo-dokter',
+  },
+  {
     id: 'devices',
     title: 'Devices',
     subtitle: 'Pair Omron, scales & sensors',
     icon: 'bluetooth',
-    color: '#007AFF',
-    bgColor: '#007AFF15',
+    color: '#0A84FF',
+    bgColor: '#0A84FF15',
     route: '/(tabs)/devices',
   },
   {
@@ -58,6 +68,16 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/nams',
   },
   {
+    id: 'chat',
+    title: 'AI Clinical Chat',
+    subtitle: 'Gemini 2.5 Flash medical advisor',
+    icon: 'sparkles',
+    color: '#34C759',
+    bgColor: '#34C75915',
+    badge: 'Gemini',
+    route: '/(tabs)/chat',
+  },
+  {
     id: 'questionnaires',
     title: 'Questionnaires',
     subtitle: 'FHIR PHQ-9 & GAD-7 screening',
@@ -65,24 +85,6 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     color: '#FF9500',
     bgColor: '#FF950015',
     route: '/(tabs)/schedule',
-  },
-  {
-    id: 'chat',
-    title: 'AI Clinical Chat',
-    subtitle: 'Spezi LLM medical assistant',
-    icon: 'chatbubble-ellipses',
-    color: '#34C759',
-    bgColor: '#34C75915',
-    route: '/(tabs)/chat',
-  },
-  {
-    id: 'health',
-    title: 'Health Sync',
-    subtitle: 'Apple HealthKit & sensor sync',
-    icon: 'pulse',
-    color: '#AF52DE',
-    bgColor: '#AF52DE15',
-    route: '/(tabs)/health',
   },
 ];
 
@@ -152,6 +154,56 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
+        {/* CONNECTED DOCTOR LIVE CARD (HALO DOKTER) */}
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => router.push('/halo-dokter')}
+          style={[styles.doctorConnectedBanner, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
+        >
+          <View style={styles.docBannerTop}>
+            <View style={styles.docBadge}>
+              <Ionicons name="shield-checkmark" size={12} color="#FFFFFF" />
+              <Text style={styles.docBadgeText}>DOKTER TERHUBUNG (HALO DOKTER)</Text>
+            </View>
+            <View style={styles.docLivePill}>
+              <View style={styles.docLiveDot} />
+              <Text style={styles.docLiveText}>Online</Text>
+            </View>
+          </View>
+
+          <View style={styles.docBannerMain}>
+            <View style={styles.docAvatarWrap}>
+              <Ionicons name="person" size={28} color="#FFFFFF" />
+              <View style={styles.docVerifiedTick}>
+                <Ionicons name="checkmark" size={9} color="#FFFFFF" />
+              </View>
+            </View>
+
+            <View style={styles.docInfoCol}>
+              <Text style={[styles.docName, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                dr. Budi Santoso, Sp.JP(K), FIHA
+              </Text>
+              <Text style={styles.docSpecialty}>
+                Spesialis Jantung & Pembuluh Darah • DPJP Utama
+              </Text>
+              <Text style={styles.docHospital}>
+                RS Jantung Harapan Kita • Siap Konsultasi
+              </Text>
+            </View>
+          </View>
+
+          <View style={[styles.docBannerFooter, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+            <View style={styles.docFooterLeft}>
+              <Ionicons name="chatbubble-ellipses" size={16} color="#007AFF" />
+              <Text style={styles.docFooterText}>Terhubung via Rekam Medis Supabase</Text>
+            </View>
+            <View style={styles.docFooterAction}>
+              <Text style={styles.docFooterActionText}>Konsultasi</Text>
+              <Ionicons name="chevron-forward" size={14} color="#007AFF" />
+            </View>
+          </View>
+        </TouchableOpacity>
 
         {/* Section Title */}
         <View style={styles.sectionHeader}>
@@ -260,7 +312,7 @@ const styles = StyleSheet.create({
   vitalsBanner: {
     borderRadius: 22,
     padding: 18,
-    marginBottom: 24,
+    marginBottom: 16,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -328,6 +380,137 @@ const styles = StyleSheet.create({
     height: 36,
     backgroundColor: '#8E8E9330',
   },
+
+  // CONNECTED DOCTOR LIVE CARD
+  doctorConnectedBanner: {
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#007AFF25',
+  },
+  docBannerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  docBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  docBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  docLivePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#34C75918',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  docLiveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#34C759',
+  },
+  docLiveText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#34C759',
+  },
+  docBannerMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  docAvatarWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  docVerifiedTick: {
+    position: 'absolute',
+    bottom: -1,
+    right: -1,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#34C759',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+  },
+  docInfoCol: {
+    flex: 1,
+    gap: 1,
+  },
+  docName: {
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  docSpecialty: {
+    fontSize: 11,
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  docHospital: {
+    fontSize: 10,
+    color: '#8E8E93',
+  },
+  docBannerFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  docFooterLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  docFooterText: {
+    fontSize: 10,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  docFooterAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  docFooterActionText: {
+    fontSize: 11,
+    color: '#007AFF',
+    fontWeight: '700',
+  },
+
+  // SECTION HEADER
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
