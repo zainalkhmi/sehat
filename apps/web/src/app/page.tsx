@@ -18,6 +18,13 @@ export default function HomePage() {
           </div>
           <div className="flex items-center space-x-4">
             <Link
+              href="/dashboard/doctor/medx"
+              className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-cyan-50 border border-cyan-200 text-cyan-800 hover:bg-cyan-100 transition-colors flex items-center gap-1.5"
+            >
+              <Brain className="w-3.5 h-3.5 text-cyan-600" />
+              <span>MedX Doctor AI</span>
+            </Link>
+            <Link
               href="/sdk"
               className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 transition-colors flex items-center gap-1.5"
             >
@@ -74,6 +81,14 @@ export default function HomePage() {
               className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-medium shadow-md transition-all hover:-translate-y-0.5"
             >
               <span>Researcher Portal</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/dashboard/doctor/medx"
+              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-medium shadow-md shadow-cyan-600/20 transition-all hover:-translate-y-0.5"
+            >
+              <Brain className="w-4 h-4" />
+              <span>MedX Doctor AI</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link

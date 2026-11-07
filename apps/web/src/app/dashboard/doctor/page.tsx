@@ -171,6 +171,14 @@ export default function DoctorDashboard() {
             </button>
 
             <Link
+              href="/dashboard/doctor/medx"
+              className="text-xs bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm transition flex items-center space-x-1"
+            >
+              <Brain className="w-3.5 h-3.5" />
+              <span>🩺 MedX Clinical AI</span>
+            </Link>
+
+            <Link
               href="/dashboard/doctor/risk-assessments"
               className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3 py-1.5 rounded-lg shadow-sm transition flex items-center"
             >
@@ -420,6 +428,13 @@ export default function DoctorDashboard() {
                               >
                                 Tolak (False Positive)
                               </button>
+                              <Link
+                                href="/dashboard/doctor/medx"
+                                className="px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-800 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1"
+                              >
+                                <Brain className="w-3.5 h-3.5 mr-1" />
+                                <span>Buka MedX DDx & RAG</span>
+                              </Link>
                             </>
                           ) : (
                             <div className="text-xs font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg flex items-center">
