@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -46,7 +47,11 @@ interface VitalRecord {
   systolic: number;
   diastolic: number;
   heartRate: number;
-  bloodSugar?: number;
+  oxygenSaturation: number; // SpO2 (%)
+  bloodSugar?: number; // mg/dL
+  temperature?: number; // °C
+  source: 'ble' | 'wearable' | 'oximeter' | 'manual';
+  deviceName?: string; // e.g. "Omron BP5250 (BLE)", "Apple Watch Series 9"
   notes?: string;
   status: 'optimal' | 'normal' | 'pre-hypertension' | 'high';
 }
@@ -148,8 +153,12 @@ const INITIAL_VITALS: VitalRecord[] = [
     systolic: 103,
     diastolic: 64,
     heartRate: 62,
+    oxygenSaturation: 98,
     bloodSugar: 98,
-    notes: 'Pengukuran rutin pagi setelah minum Amlodipine',
+    temperature: 36.5,
+    source: 'ble',
+    deviceName: 'Omron BP5250 & Apple Watch',
+    notes: 'Pengukuran rutin pagi otomatis dari tensimeter BLE & wearable',
     status: 'optimal',
   },
   {
@@ -159,8 +168,12 @@ const INITIAL_VITALS: VitalRecord[] = [
     systolic: 112,
     diastolic: 74,
     heartRate: 68,
+    oxygenSaturation: 99,
     bloodSugar: 115,
-    notes: 'Pasca makan malam dan minum Candesartan',
+    temperature: 36.6,
+    source: 'wearable',
+    deviceName: 'Apple Watch Series 9',
+    notes: 'Telemetri otomatis malam pasca minum Candesartan',
     status: 'optimal',
   },
   {
@@ -170,7 +183,11 @@ const INITIAL_VITALS: VitalRecord[] = [
     systolic: 118,
     diastolic: 76,
     heartRate: 72,
+    oxygenSaturation: 98,
     bloodSugar: 102,
+    temperature: 36.4,
+    source: 'oximeter',
+    deviceName: 'Beurer PO 30 Pulse Oximeter & BLE Cuff',
     notes: 'Kondisi relaks, istirahat cukup',
     status: 'normal',
   },
@@ -243,7 +260,7 @@ export default function TherapyControlScreen() {
   const isDark = colorScheme === 'dark';
 
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'meds' | 'vitals' | 'habits' | 'report'>('meds');
+  const [activeTab, setActiveTab] = useState<'meds' | 'vitals' | 'habits' | 'report'>('vitals');
 
   // Medications state
   const [medications, setMedications] = useState<MedicationItem[]>(INITIAL_MEDICATIONS);
@@ -267,13 +284,18 @@ export default function TherapyControlScreen() {
   // Vitals state
   const [vitals, setVitals] = useState<VitalRecord[]>(INITIAL_VITALS);
   const [addVitalModalVisible, setAddVitalModalVisible] = useState(false);
+  const [deviceSyncModalVisible, setDeviceSyncModalVisible] = useState(false);
+  const [isSyncingDevices, setIsSyncingDevices] = useState(false);
 
-  // New vital form
+  // New vital form (Manual)
   const [newSystolic, setNewSystolic] = useState('110');
   const [newDiastolic, setNewDiastolic] = useState('70');
   const [newHeartRate, setNewHeartRate] = useState('68');
+  const [newOxygen, setNewOxygen] = useState('98');
   const [newBloodSugar, setNewBloodSugar] = useState('100');
+  const [newTemperature, setNewTemperature] = useState('36.5');
   const [newVitalNotes, setNewVitalNotes] = useState('');
+  const [newVitalSource, setNewVitalSource] = useState<'ble' | 'wearable' | 'oximeter' | 'manual'>('manual');
 
   // Daily Habits state
   const [waterGlasses, setWaterGlasses] = useState(6);
@@ -386,12 +408,54 @@ export default function TherapyControlScreen() {
     Alert.alert('Obat Berhasil Ditambahkan', `Pengingat dan kontrol stok untuk ${newMed.name} telah aktif di database.`);
   };
 
-  // Handle Add Vital Record
+  // Handle Sync Vitals From Connected BLE & Wearables
+  const handleTriggerDeviceSync = () => {
+    setIsSyncingDevices(true);
+    setDeviceSyncModalVisible(true);
+
+    // Simulate real BLE / HealthKit handshake reading
+    setTimeout(() => {
+      setIsSyncingDevices(false);
+    }, 1200);
+  };
+
+  // Confirm Apply Device Telemetry
+  const handleApplyDeviceTelemetry = () => {
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`;
+
+    const newRecord: VitalRecord = {
+      id: `vit-${Date.now()}`,
+      date: 'Hari Ini',
+      time: timeStr,
+      systolic: 103,
+      diastolic: 64,
+      heartRate: 62,
+      oxygenSaturation: 98,
+      bloodSugar: 98,
+      temperature: 36.5,
+      source: 'ble',
+      deviceName: 'Omron BP5250 & Apple Watch (BLE Sync)',
+      notes: 'Telemetri otomatis dari Omron BP5250 (Tensi/Nadi) & Apple Watch (SpO2/Suhu)',
+      status: 'optimal',
+    };
+
+    setVitals((prev) => [newRecord, ...prev]);
+    setDeviceSyncModalVisible(false);
+    Alert.alert(
+      'Telemetri Device Tersimpan',
+      'Data Tensi (103/64 mmHg), Heart Rate (62 BPM), Saturasi Oksigen (98% SpO2), dan Gula Darah (98 mg/dL) berhasil ditarik dari Omron BP5250 & Apple Watch serta dicatat ke rekam medis Supabase.'
+    );
+  };
+
+  // Handle Add Manual Vital Record
   const handleAddVital = () => {
     const sys = parseInt(newSystolic, 10) || 120;
     const dia = parseInt(newDiastolic, 10) || 80;
     const hr = parseInt(newHeartRate, 10) || 72;
+    const ox = parseInt(newOxygen, 10) || 98;
     const bs = parseInt(newBloodSugar, 10) || 100;
+    const temp = parseFloat(newTemperature) || 36.5;
 
     let status: VitalRecord['status'] = 'optimal';
     if (sys >= 140 || dia >= 90) status = 'high';
@@ -408,8 +472,19 @@ export default function TherapyControlScreen() {
       systolic: sys,
       diastolic: dia,
       heartRate: hr,
+      oxygenSaturation: ox,
       bloodSugar: bs,
-      notes: newVitalNotes.trim() || 'Pencatatan harian mandiri',
+      temperature: temp,
+      source: newVitalSource,
+      deviceName:
+        newVitalSource === 'ble'
+          ? 'Omron BP5250 BLE'
+          : newVitalSource === 'wearable'
+          ? 'Apple Watch Series 9'
+          : newVitalSource === 'oximeter'
+          ? 'Pulse Oximeter BLE'
+          : 'Input Manual Pasien',
+      notes: newVitalNotes.trim() || 'Pencatatan vital harian',
       status,
     };
 
@@ -418,7 +493,7 @@ export default function TherapyControlScreen() {
     setNewVitalNotes('');
     Alert.alert(
       'Vital Signs Tersimpan',
-      `Tensi ${sys}/${dia} mmHg (${status.toUpperCase()}) dan detak jantung ${hr} BPM berhasil dicatat ke rekam medis Supabase.`
+      `Tensi ${sys}/${dia} mmHg (${status.toUpperCase()}), Detak Jantung ${hr} BPM, dan SpO2 ${ox}% berhasil dicatat ke rekam medis Supabase.`
     );
   };
 
@@ -454,11 +529,11 @@ export default function TherapyControlScreen() {
         <View style={styles.dbStatusLeft}>
           <View style={styles.dbDot} />
           <Text style={styles.dbStatusText}>
-            Terkoneksi ke Supabase DB (patient_medications & medication_logs)
+            Terkoneksi ke Supabase DB (patient_medications & observations)
           </Text>
         </View>
         <TouchableOpacity
-          onPress={() => Alert.alert('Status Database', 'Tersinkronisasi secara aman sesuai UU PDP No. 27/2022 & HL7 FHIR MedicationRequest.')}
+          onPress={() => Alert.alert('Status Database', 'Tersinkronisasi secara aman sesuai UU PDP No. 27/2022 & HL7 FHIR Observation / MedicationRequest.')}
         >
           <Ionicons name="cloud-done" size={16} color="#34C759" />
         </TouchableOpacity>
@@ -762,44 +837,107 @@ export default function TherapyControlScreen() {
           </View>
         )}
 
-        {/* ================= TAB 2: VITALS & BLOOD PRESSURE ================= */}
+        {/* ================= TAB 2: VITALS & BLOOD PRESSURE (BLE & WEARABLE) ================= */}
         {activeTab === 'vitals' && (
           <View style={styles.sectionWrap}>
-            {/* Quick Logging Action Card */}
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={[styles.quickLogCard, { backgroundColor: '#007AFF' }]}
-              onPress={() => setAddVitalModalVisible(true)}
-            >
-              <View style={styles.quickLogLeft}>
-                <Ionicons name="heart-circle" size={32} color="#FFFFFF" />
-                <View>
-                  <Text style={styles.quickLogTitle}>Catat Tensi & Detak Jantung</Text>
-                  <Text style={styles.quickLogSub}>Input manual atau sinkronisasi alat BLE</Text>
+            {/* HERO ACTION: DUAL SYNC OR MANUAL INPUT */}
+            <View style={styles.vitalsActionContainer}>
+              {/* Primary Card: Sync from Device & Wearables */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                style={[styles.syncDeviceHeroCard, { backgroundColor: '#007AFF' }]}
+                onPress={handleTriggerDeviceSync}
+              >
+                <View style={styles.syncDeviceHeroTop}>
+                  <View style={styles.syncDeviceIconWrap}>
+                    <Ionicons name="bluetooth" size={24} color="#007AFF" />
+                  </View>
+                  <View style={styles.syncDeviceStatusBadge}>
+                    <View style={styles.syncDeviceDot} />
+                    <Text style={styles.syncDeviceStatusText}>2 Perangkat Terkoneksi</Text>
+                  </View>
                 </View>
-              </View>
-              <Ionicons name="arrow-forward-circle" size={26} color="#FFFFFF" />
-            </TouchableOpacity>
 
+                <View style={styles.syncDeviceHeroBody}>
+                  <Text style={styles.syncDeviceHeroTitle}>
+                    Tarik Data dari Device & Wearable
+                  </Text>
+                  <Text style={styles.syncDeviceHeroSub}>
+                    Ambil Tensi, Detak Jantung, Oksigen SpO2 & Gula Darah otomatis via Omron BLE & Smartwatch
+                  </Text>
+                </View>
+
+                <View style={styles.syncDeviceHeroFooter}>
+                  <View style={styles.syncDeviceTagsRow}>
+                    <Text style={styles.syncDeviceTag}>🩺 Omron BP5250</Text>
+                    <Text style={styles.syncDeviceTag}>⌚ Apple Watch</Text>
+                    <Text style={styles.syncDeviceTag}>💨 Pulse Oximeter</Text>
+                  </View>
+                  <View style={styles.syncDeviceArrowWrap}>
+                    <Ionicons name="cloud-download-outline" size={20} color="#FFFFFF" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+
+              {/* Quick Manual Input Pill Button */}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.manualInputPillBtn,
+                  { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                ]}
+                onPress={() => setAddVitalModalVisible(true)}
+              >
+                <Ionicons name="create-outline" size={18} color="#007AFF" />
+                <Text style={styles.manualInputPillText}>Atau Input Pengukuran Manual</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* History Section Header */}
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>RIWAYAT PENGUKURAN VITAL</Text>
+              <Text style={styles.sectionTitle}>RIWAYAT PENGUKURAN VITAL LENGKAP</Text>
               <TouchableOpacity onPress={() => setAddVitalModalVisible(true)}>
                 <Text style={styles.sectionActionText}>+ Catat Baru</Text>
               </TouchableOpacity>
             </View>
 
+            {/* List of Vital Records with Full Parameters */}
             {vitals.map((item) => (
               <View
                 key={item.id}
                 style={[styles.vitalCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
               >
+                {/* Header Row: DateTime, Source Device & Status */}
                 <View style={styles.vitalCardHeader}>
-                  <View style={styles.vitalDateTimeWrap}>
-                    <Ionicons name="calendar-outline" size={14} color="#8E8E93" />
-                    <Text style={styles.vitalDateText}>
-                      {item.date} • {item.time}
-                    </Text>
+                  <View style={styles.vitalHeaderLeftCol}>
+                    <View style={styles.vitalDateTimeWrap}>
+                      <Ionicons name="calendar-outline" size={13} color="#8E8E93" />
+                      <Text style={styles.vitalDateText}>
+                        {item.date} • {item.time}
+                      </Text>
+                    </View>
+
+                    {/* Source Device Badge */}
+                    <View style={styles.vitalSourceBadge}>
+                      <Ionicons
+                        name={
+                          item.source === 'ble'
+                            ? 'bluetooth'
+                            : item.source === 'wearable'
+                            ? 'watch-outline'
+                            : item.source === 'oximeter'
+                            ? 'pulse'
+                            : 'pencil'
+                        }
+                        size={12}
+                        color="#007AFF"
+                      />
+                      <Text style={styles.vitalSourceText}>
+                        {item.deviceName || (item.source === 'ble' ? 'Tensimeter BLE' : 'Manual')}
+                      </Text>
+                    </View>
                   </View>
+
                   <View
                     style={[
                       styles.vitalStatusBadge,
@@ -831,10 +969,14 @@ export default function TherapyControlScreen() {
                   </View>
                 </View>
 
-                {/* Grid of Measurements */}
-                <View style={styles.vitalMeasurementsGrid}>
+                {/* Grid of 4 Complete Parameters: Tensi, Detak Jantung, Oksigen, Gula Darah */}
+                <View style={[styles.vitalMeasurementsGrid, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+                  {/* Parameter 1: Tensi Darah */}
                   <View style={styles.vitalGridItem}>
-                    <Text style={styles.vitalGridLabel}>Tensi Darah</Text>
+                    <View style={styles.vitalGridLabelRow}>
+                      <Ionicons name="heart-circle" size={13} color="#FF2D55" />
+                      <Text style={styles.vitalGridLabel}>Tensi Darah</Text>
+                    </View>
                     <Text style={[styles.vitalGridValue, { color: isDark ? '#FFFFFF' : '#000000' }]}>
                       {item.systolic}/{item.diastolic}
                     </Text>
@@ -843,8 +985,12 @@ export default function TherapyControlScreen() {
 
                   <View style={styles.vitalGridDivider} />
 
+                  {/* Parameter 2: Detak Jantung (Pulse) */}
                   <View style={styles.vitalGridItem}>
-                    <Text style={styles.vitalGridLabel}>Detak Jantung</Text>
+                    <View style={styles.vitalGridLabelRow}>
+                      <Ionicons name="pulse" size={13} color="#007AFF" />
+                      <Text style={styles.vitalGridLabel}>Detak Jantung</Text>
+                    </View>
                     <Text style={[styles.vitalGridValue, { color: isDark ? '#FFFFFF' : '#000000' }]}>
                       {item.heartRate}
                     </Text>
@@ -853,18 +999,49 @@ export default function TherapyControlScreen() {
 
                   <View style={styles.vitalGridDivider} />
 
+                  {/* Parameter 3: Saturasi Oksigen (SpO2) */}
                   <View style={styles.vitalGridItem}>
-                    <Text style={styles.vitalGridLabel}>Gula Darah</Text>
+                    <View style={styles.vitalGridLabelRow}>
+                      <Ionicons name="water" size={13} color="#34C759" />
+                      <Text style={styles.vitalGridLabel}>Oksigen SpO2</Text>
+                    </View>
+                    <Text style={[styles.vitalGridValue, { color: '#34C759' }]}>
+                      {item.oxygenSaturation || 98}%
+                    </Text>
+                    <Text style={styles.vitalGridUnit}>Saturasi O2</Text>
+                  </View>
+
+                  <View style={styles.vitalGridDivider} />
+
+                  {/* Parameter 4: Gula Darah */}
+                  <View style={styles.vitalGridItem}>
+                    <View style={styles.vitalGridLabelRow}>
+                      <Ionicons name="color-filter-outline" size={13} color="#FF9500" />
+                      <Text style={styles.vitalGridLabel}>Gula Darah</Text>
+                    </View>
                     <Text style={[styles.vitalGridValue, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-                      {item.bloodSugar || 100}
+                      {item.bloodSugar || 98}
                     </Text>
                     <Text style={styles.vitalGridUnit}>mg/dL</Text>
                   </View>
                 </View>
 
-                {item.notes ? (
-                  <Text style={styles.vitalNotesText}>📝 {item.notes}</Text>
-                ) : null}
+                {/* Card Footer: Temperature, Notes & Supabase Sync */}
+                <View style={styles.vitalCardFooter}>
+                  <View style={styles.vitalFooterLeft}>
+                    <Text style={styles.vitalTempText}>🌡️ {item.temperature || 36.5} °C</Text>
+                    {item.notes ? (
+                      <Text numberOfLines={1} style={styles.vitalNotesText}>
+                        📝 {item.notes}
+                      </Text>
+                    ) : null}
+                  </View>
+
+                  <View style={styles.vitalSyncedTag}>
+                    <Ionicons name="cloud-done" size={12} color="#34C759" />
+                    <Text style={styles.vitalSyncedTagText}>Supabase DB</Text>
+                  </View>
+                </View>
               </View>
             ))}
           </View>
@@ -1053,7 +1230,205 @@ export default function TherapyControlScreen() {
         )}
       </ScrollView>
 
-      {/* MODAL 1: RESTOK OBAT CEPAT */}
+      {/* ================= MODAL: TARIK DATA DARI DEVICE & WEARABLE ================= */}
+      <Modal
+        visible={deviceSyncModalVisible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setDeviceSyncModalVisible(false)}
+      >
+        <SafeAreaView
+          style={[styles.modalSafeContainer, { backgroundColor: isDark ? '#000000' : '#F2F2F7' }]}
+        >
+          <View style={[styles.modalHeader, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
+            <View style={styles.syncModalHeaderLeft}>
+              <View style={styles.syncRadarIcon}>
+                <Ionicons name="bluetooth" size={20} color="#007AFF" />
+              </View>
+              <View>
+                <Text style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                  Sinkronisasi Device & Wearable
+                </Text>
+                <Text style={styles.syncModalSub}>
+                  {isSyncingDevices ? 'Membaca telemetri via Bluetooth...' : 'Perangkat Siap & Terhubung'}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity onPress={() => setDeviceSyncModalVisible(false)}>
+              <Ionicons name="close-circle" size={28} color="#8E8E93" />
+            </TouchableOpacity>
+          </View>
+
+          {isSyncingDevices ? (
+            <View style={styles.syncLoadingContainer}>
+              <ActivityIndicator size="large" color="#007AFF" />
+              <Text style={[styles.syncLoadingText, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                Membaca Data Sensor Terkini...
+              </Text>
+              <Text style={styles.syncLoadingSub}>
+                Menghubungkan ke Omron BP5250, Apple Watch & Pulse Oximeter BLE
+              </Text>
+            </View>
+          ) : (
+            <ScrollView contentContainerStyle={styles.modalScroll}>
+              <Text style={styles.syncPreviewHeader}>HASIL BACAAN SENSOR REAL-TIME</Text>
+
+              {/* Device 1: Omron BP5250 */}
+              <View
+                style={[
+                  styles.deviceResultCard,
+                  { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                ]}
+              >
+                <View style={styles.deviceResultTop}>
+                  <View style={styles.deviceResultLeft}>
+                    <Ionicons name="heart-circle" size={24} color="#FF2D55" />
+                    <View>
+                      <Text
+                        style={[
+                          styles.deviceResultName,
+                          { color: isDark ? '#FFFFFF' : '#000000' },
+                        ]}
+                      >
+                        Omron BP5250 Upper Arm Cuff
+                      </Text>
+                      <Text style={styles.deviceResultTech}>Bluetooth BLE • Baterai 100%</Text>
+                    </View>
+                  </View>
+                  <View style={styles.deviceCheckBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                    <Text style={styles.deviceCheckText}>Terbaca</Text>
+                  </View>
+                </View>
+
+                <View style={styles.deviceMetricsRow}>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Tensi Darah</Text>
+                    <Text style={[styles.deviceMetricValue, { color: '#007AFF' }]}>
+                      103/64 <Text style={styles.deviceMetricUnit}>mmHg</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Optimal (AHA/ESH)</Text>
+                  </View>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Denyut Nadi</Text>
+                    <Text style={[styles.deviceMetricValue, { color: '#FF2D55' }]}>
+                      62 <Text style={styles.deviceMetricUnit}>BPM</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Resting Normal</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Device 2: Pulse Oximeter BLE (SpO2 Oksigen) */}
+              <View
+                style={[
+                  styles.deviceResultCard,
+                  { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                ]}
+              >
+                <View style={styles.deviceResultTop}>
+                  <View style={styles.deviceResultLeft}>
+                    <Ionicons name="water" size={24} color="#34C759" />
+                    <View>
+                      <Text
+                        style={[
+                          styles.deviceResultName,
+                          { color: isDark ? '#FFFFFF' : '#000000' },
+                        ]}
+                      >
+                        Beurer PO 30 Pulse Oximeter
+                      </Text>
+                      <Text style={styles.deviceResultTech}>BLE SpO2 Sensor • Jari Tangan</Text>
+                    </View>
+                  </View>
+                  <View style={styles.deviceCheckBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                    <Text style={styles.deviceCheckText}>Terbaca</Text>
+                  </View>
+                </View>
+
+                <View style={styles.deviceMetricsRow}>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Saturasi Oksigen (SpO2)</Text>
+                    <Text style={[styles.deviceMetricValue, { color: '#34C759' }]}>
+                      98% <Text style={styles.deviceMetricUnit}>SpO2</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Oksigenasi Baik</Text>
+                  </View>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Perfusion Index</Text>
+                    <Text style={[styles.deviceMetricValue, { color: isDark ? '#FFF' : '#000' }]}>
+                      4.2% <Text style={styles.deviceMetricUnit}>PI</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Aliran Darah Stabil</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Device 3: Apple Watch / Wearable Smartwatch */}
+              <View
+                style={[
+                  styles.deviceResultCard,
+                  { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                ]}
+              >
+                <View style={styles.deviceResultTop}>
+                  <View style={styles.deviceResultLeft}>
+                    <Ionicons name="watch" size={24} color="#AF52DE" />
+                    <View>
+                      <Text
+                        style={[
+                          styles.deviceResultName,
+                          { color: isDark ? '#FFFFFF' : '#000000' },
+                        ]}
+                      >
+                        Apple Watch Series 9 (Wearable)
+                      </Text>
+                      <Text style={styles.deviceResultTech}>Apple HealthKit / Health Connect</Text>
+                    </View>
+                  </View>
+                  <View style={styles.deviceCheckBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                    <Text style={styles.deviceCheckText}>Terbaca</Text>
+                  </View>
+                </View>
+
+                <View style={styles.deviceMetricsRow}>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Suhu Kulit/Tubuh</Text>
+                    <Text style={[styles.deviceMetricValue, { color: isDark ? '#FFF' : '#000' }]}>
+                      36.5 <Text style={styles.deviceMetricUnit}>°C</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Normal Eutermik</Text>
+                  </View>
+                  <View style={styles.deviceMetricCol}>
+                    <Text style={styles.deviceMetricLabel}>Glukosa Darah (CGM)</Text>
+                    <Text style={[styles.deviceMetricValue, { color: '#FF9500' }]}>
+                      98 <Text style={styles.deviceMetricUnit}>mg/dL</Text>
+                    </Text>
+                    <Text style={styles.deviceMetricStatus}>Gula Puasa Normal</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Confirm & Save Button */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                style={styles.modalSubmitBtn}
+                onPress={handleApplyDeviceTelemetry}
+              >
+                <Ionicons name="cloud-upload" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={styles.modalSubmitBtnText}>
+                  Terapkan & Simpan ke Rekam Medis Supabase
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          )}
+        </SafeAreaView>
+      </Modal>
+
+      {/* ================= MODAL: RESTOK OBAT CEPAT ================= */}
       <Modal
         visible={restockModalVisible}
         animationType="slide"
@@ -1130,7 +1505,7 @@ export default function TherapyControlScreen() {
         </View>
       </Modal>
 
-      {/* MODAL 2: TAMBAH RESEP OBAT BARU */}
+      {/* ================= MODAL: TAMBAH RESEP OBAT BARU ================= */}
       <Modal
         visible={addMedModalVisible}
         animationType="slide"
@@ -1314,7 +1689,7 @@ export default function TherapyControlScreen() {
         </SafeAreaView>
       </Modal>
 
-      {/* MODAL 3: CATAT TENSI & VITAL */}
+      {/* ================= MODAL: CATAT TENSI & VITAL MANUAL ================= */}
       <Modal
         visible={addVitalModalVisible}
         animationType="slide"
@@ -1326,7 +1701,7 @@ export default function TherapyControlScreen() {
         >
           <View style={[styles.modalHeader, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
             <Text style={[styles.modalTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-              Catat Tensi & Vital
+              Catat Tensi & Vital Lengkap
             </Text>
             <TouchableOpacity onPress={() => setAddVitalModalVisible(false)}>
               <Ionicons name="close-circle" size={28} color="#8E8E93" />
@@ -1334,6 +1709,37 @@ export default function TherapyControlScreen() {
           </View>
 
           <ScrollView contentContainerStyle={styles.modalScroll}>
+            {/* Sumber Alat */}
+            <Text style={styles.inputLabel}>SUMBER PERANGKAT PENGUKURAN</Text>
+            <View style={styles.chipRow}>
+              {[
+                { key: 'ble', label: 'Tensimeter Omron BLE' },
+                { key: 'wearable', label: 'Apple Watch / Smartwatch' },
+                { key: 'oximeter', label: 'Pulse Oximeter' },
+                { key: 'manual', label: 'Input Manual Pasien' },
+              ].map((src) => (
+                <TouchableOpacity
+                  key={src.key}
+                  style={[
+                    styles.chipBtn,
+                    newVitalSource === src.key && styles.chipBtnActive,
+                    { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' },
+                  ]}
+                  onPress={() => setNewVitalSource(src.key as any)}
+                >
+                  <Text
+                    style={[
+                      styles.chipBtnText,
+                      newVitalSource === src.key && styles.chipBtnTextActive,
+                    ]}
+                  >
+                    {src.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Tensi */}
             <Text style={styles.inputLabel}>TEKANAN DARAH (SISTOLIK / DIASTOLIK mmHg) *</Text>
             <View style={styles.dualInputRow}>
               <View style={styles.dualInputCol}>
@@ -1373,37 +1779,82 @@ export default function TherapyControlScreen() {
               </View>
             </View>
 
-            <Text style={styles.inputLabel}>DETAK JANTUNG / NADI (BPM) *</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  color: isDark ? '#FFFFFF' : '#000000',
-                  backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-                },
-              ]}
-              placeholder="72"
-              placeholderTextColor="#8E8E93"
-              keyboardType="numeric"
-              value={newHeartRate}
-              onChangeText={setNewHeartRate}
-            />
+            {/* Detak Jantung & Oksigen SpO2 */}
+            <View style={styles.dualInputRow}>
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>DETAK JANTUNG (BPM) *</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="72"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newHeartRate}
+                  onChangeText={setNewHeartRate}
+                />
+              </View>
 
-            <Text style={styles.inputLabel}>GULA DARAH (mg/dL - Opsional)</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                {
-                  color: isDark ? '#FFFFFF' : '#000000',
-                  backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-                },
-              ]}
-              placeholder="100"
-              placeholderTextColor="#8E8E93"
-              keyboardType="numeric"
-              value={newBloodSugar}
-              onChangeText={setNewBloodSugar}
-            />
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>SATURASI OKSIGEN (SpO2 %) *</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="98"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newOxygen}
+                  onChangeText={setNewOxygen}
+                />
+              </View>
+            </View>
+
+            {/* Gula Darah & Suhu Tubuh */}
+            <View style={styles.dualInputRow}>
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>GULA DARAH (mg/dL)</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="100"
+                  placeholderTextColor="#8E8E93"
+                  keyboardType="numeric"
+                  value={newBloodSugar}
+                  onChangeText={setNewBloodSugar}
+                />
+              </View>
+
+              <View style={styles.dualInputCol}>
+                <Text style={styles.inputLabel}>SUHU TUBUH (°C)</Text>
+                <TextInput
+                  style={[
+                    styles.textInput,
+                    {
+                      color: isDark ? '#FFFFFF' : '#000000',
+                      backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                    },
+                  ]}
+                  placeholder="36.5"
+                  placeholderTextColor="#8E8E93"
+                  value={newTemperature}
+                  onChangeText={setNewTemperature}
+                />
+              </View>
+            </View>
 
             <Text style={styles.inputLabel}>CATATAN KONDISI / KELUHAN</Text>
             <TextInput
@@ -1805,34 +2256,118 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // VITALS LOGGING
-  quickLogCard: {
+  // VITALS & WEARABLES HERO SECTION
+  vitalsActionContainer: {
+    gap: 8,
+    marginBottom: 6,
+  },
+  syncDeviceHeroCard: {
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 4,
+    gap: 10,
+  },
+  syncDeviceHeroTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderRadius: 18,
-    marginBottom: 6,
-    shadowColor: '#007AFF',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
   },
-  quickLogLeft: {
+  syncDeviceIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  syncDeviceStatusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 5,
+    backgroundColor: '#FFFFFF25',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  quickLogTitle: {
+  syncDeviceDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#34C759',
+  },
+  syncDeviceStatusText: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  quickLogSub: {
-    color: '#FFFFFF90',
     fontSize: 11,
+    fontWeight: '700',
   },
+  syncDeviceHeroBody: {
+    gap: 3,
+  },
+  syncDeviceHeroTitle: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  syncDeviceHeroSub: {
+    color: '#FFFFFFD0',
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  syncDeviceHeroFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#FFFFFF30',
+  },
+  syncDeviceTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  syncDeviceTag: {
+    backgroundColor: '#FFFFFF18',
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  syncDeviceArrowWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF25',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  manualInputPillBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  manualInputPillText: {
+    color: '#007AFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+
+  // VITAL RECORD CARD WITH COMPLETE 4 PARAMETERS
   vitalCard: {
     borderRadius: 18,
     padding: 16,
@@ -1848,19 +2383,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  vitalHeaderLeftCol: {
+    gap: 3,
+  },
   vitalDateTimeWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
   },
   vitalDateText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#8E8E93',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  vitalSourceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  vitalSourceText: {
+    fontSize: 10,
+    color: '#007AFF',
+    fontWeight: '600',
   },
   vitalStatusBadge: {
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 6,
   },
   vitalStatusBadgeText: {
@@ -1871,37 +2418,76 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
   vitalGridItem: {
     flex: 1,
     alignItems: 'center',
+    gap: 1,
   },
-  vitalGridLabel: {
-    fontSize: 10,
-    color: '#8E8E93',
+  vitalGridLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
     marginBottom: 2,
   },
+  vitalGridLabel: {
+    fontSize: 9,
+    color: '#8E8E93',
+    fontWeight: '700',
+  },
   vitalGridValue: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: '800',
   },
   vitalGridUnit: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#8E8E93',
-    marginTop: 1,
   },
   vitalGridDivider: {
     width: StyleSheet.hairlineWidth,
     height: 32,
     backgroundColor: '#8E8E9330',
   },
-  vitalNotesText: {
-    fontSize: 11,
-    color: '#8E8E93',
+  vitalCardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingTop: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#8E8E9320',
+  },
+  vitalFooterLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+  },
+  vitalTempText: {
+    fontSize: 11,
+    color: '#8E8E93',
+    fontWeight: '600',
+  },
+  vitalNotesText: {
+    fontSize: 11,
+    color: '#8E8E93',
+    flex: 1,
+  },
+  vitalSyncedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: '#34C75915',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  vitalSyncedTagText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#34C759',
   },
 
   // HABITS CARDS
@@ -2166,6 +2752,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
     marginTop: 14,
     marginBottom: 40,
   },
@@ -2235,5 +2823,118 @@ const styles = StyleSheet.create({
   },
   presetBtnTextActive: {
     color: '#FFFFFF',
+  },
+
+  // SYNC FROM DEVICES MODAL SPECIFICS
+  syncModalHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  syncRadarIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#007AFF15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  syncModalSub: {
+    fontSize: 11,
+    color: '#8E8E93',
+  },
+  syncLoadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30,
+    gap: 12,
+  },
+  syncLoadingText: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  syncLoadingSub: {
+    fontSize: 12,
+    color: '#8E8E93',
+    textAlign: 'center',
+  },
+  syncPreviewHeader: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#8E8E93',
+    letterSpacing: 0.6,
+    marginBottom: 4,
+  },
+  deviceResultCard: {
+    borderRadius: 16,
+    padding: 14,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  deviceResultTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  deviceResultLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  deviceResultName: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  deviceResultTech: {
+    fontSize: 10,
+    color: '#8E8E93',
+  },
+  deviceCheckBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#34C75915',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  deviceCheckText: {
+    color: '#34C759',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  deviceMetricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#8E8E9320',
+  },
+  deviceMetricCol: {
+    flex: 1,
+    gap: 1,
+  },
+  deviceMetricLabel: {
+    fontSize: 10,
+    color: '#8E8E93',
+  },
+  deviceMetricValue: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  deviceMetricUnit: {
+    fontSize: 10,
+    color: '#8E8E93',
+    fontWeight: '500',
+  },
+  deviceMetricStatus: {
+    fontSize: 9,
+    color: '#34C759',
+    fontWeight: '600',
   },
 });
