@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Activity, ShieldCheck, HeartPulse, Stethoscope, Microscope, ArrowRight, Smartphone, Database, Brain, Code2 } from 'lucide-react';
+import { Activity, ShieldCheck, HeartPulse, Stethoscope, Microscope, ArrowRight, Smartphone, Database, Brain } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -23,13 +23,6 @@ export default function HomePage() {
             >
               <Brain className="w-3.5 h-3.5 text-cyan-600" />
               <span>MedX Doctor AI</span>
-            </Link>
-            <Link
-              href="/sdk"
-              className="text-sm font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 transition-colors flex items-center gap-1.5"
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              <span>Medplum SDK</span>
             </Link>
             <Link
               href="/login"
@@ -89,14 +82,6 @@ export default function HomePage() {
             >
               <Brain className="w-4 h-4" />
               <span>MedX Doctor AI</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/sdk"
-              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md shadow-indigo-600/20 transition-all hover:-translate-y-0.5"
-            >
-              <Code2 className="w-4 h-4" />
-              <span>Medplum SDK Console</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
