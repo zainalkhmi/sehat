@@ -39,13 +39,14 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/halo-dokter',
   },
   {
-    id: 'devices',
-    title: 'Devices',
-    subtitle: 'Pair Omron, scales & sensors',
-    icon: 'bluetooth',
-    color: '#0A84FF',
-    bgColor: '#0A84FF15',
-    route: '/(tabs)/devices',
+    id: 'therapy-control',
+    title: 'Kontrol Terapi',
+    subtitle: 'Pengingat obat & vital MyTherapy',
+    icon: 'alarm',
+    color: '#FF9500',
+    bgColor: '#FF950015',
+    badge: '94% Patuh',
+    route: '/therapy-control',
   },
   {
     id: 'measurements',
@@ -78,13 +79,13 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/(tabs)/chat',
   },
   {
-    id: 'questionnaires',
-    title: 'Questionnaires',
-    subtitle: 'FHIR PHQ-9 & GAD-7 screening',
-    icon: 'clipboard',
-    color: '#FF9500',
-    bgColor: '#FF950015',
-    route: '/(tabs)/schedule',
+    id: 'devices',
+    title: 'Devices',
+    subtitle: 'Pair Omron, scales & sensors',
+    icon: 'bluetooth',
+    color: '#0A84FF',
+    bgColor: '#0A84FF15',
+    route: '/(tabs)/devices',
   },
 ];
 
@@ -205,6 +206,41 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
+        {/* MYTHERAPY ACTIVE MEDICATION REMINDER WIDGET */}
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => router.push('/therapy-control')}
+          style={[styles.medReminderBanner, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
+        >
+          <View style={styles.medReminderTop}>
+            <View style={styles.medReminderHeaderLeft}>
+              <View style={styles.medPillIcon}>
+                <Ionicons name="alarm" size={16} color="#FF9500" />
+              </View>
+              <Text style={styles.medReminderHeaderTitle}>PENGINGAT OBAT MYTHERAPY</Text>
+            </View>
+            <View style={styles.medTimeBadge}>
+              <Text style={styles.medTimeBadgeText}>20:00 WIB (Malam)</Text>
+            </View>
+          </View>
+
+          <View style={styles.medReminderBody}>
+            <View style={styles.medReminderInfo}>
+              <Text style={[styles.medReminderName, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                Candesartan Cilexetil 8 mg
+              </Text>
+              <Text style={styles.medReminderSub}>
+                1 Tablet • Sesudah Makan Malam (Proteksi Kardiovaskular)
+              </Text>
+            </View>
+
+            <View style={styles.medReminderTakeBtn}>
+              <Ionicons name="checkmark-circle" size={16} color="#FFFFFF" />
+              <Text style={styles.medReminderTakeBtnText}>Minum</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
         {/* Section Title */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>FEATURE HUB (SIX-PACK MENU)</Text>
@@ -312,7 +348,7 @@ const styles = StyleSheet.create({
   vitalsBanner: {
     borderRadius: 22,
     padding: 18,
-    marginBottom: 16,
+    marginBottom: 14,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -385,7 +421,7 @@ const styles = StyleSheet.create({
   doctorConnectedBanner: {
     borderRadius: 20,
     padding: 16,
-    marginBottom: 24,
+    marginBottom: 14,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.07,
@@ -507,6 +543,88 @@ const styles = StyleSheet.create({
   docFooterActionText: {
     fontSize: 11,
     color: '#007AFF',
+    fontWeight: '700',
+  },
+
+  // MYTHERAPY MEDICATION REMINDER WIDGET
+  medReminderBanner: {
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#FF950030',
+  },
+  medReminderTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  medReminderHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  medPillIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FF950018',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  medReminderHeaderTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#FF9500',
+    letterSpacing: 0.5,
+  },
+  medTimeBadge: {
+    backgroundColor: '#FF950015',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  medTimeBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FF9500',
+  },
+  medReminderBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  medReminderInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  medReminderName: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  medReminderSub: {
+    fontSize: 10,
+    color: '#8E8E93',
+  },
+  medReminderTakeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#34C759',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+  },
+  medReminderTakeBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
     fontWeight: '700',
   },
 
