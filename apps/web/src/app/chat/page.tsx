@@ -424,14 +424,14 @@ export default function GlassAIChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full bg-[#fbfbfb] text-slate-800 font-sans overflow-hidden">
-      {/* Top Header Bar (Faithful to Glass Health UI) */}
-      <header className="h-14 border-b border-slate-200/80 bg-white px-4 flex items-center justify-between z-30 select-none">
+    <div className="flex flex-col h-screen w-full bg-[#f8fafc] text-slate-800 font-sans overflow-hidden selection:bg-sky-200">
+      {/* Top Header Bar (Luminous White & Colorful Accents) */}
+      <header className="h-14 border-b border-sky-100/90 bg-white/95 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between z-30 select-none shadow-xs">
         {/* Left Side: Sidebar Toggle & Breadcrumbs */}
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors border border-transparent hover:border-sky-100"
             title="Toggle Sidebar"
           >
             <PanelLeft className="w-4 h-4" />
@@ -440,17 +440,19 @@ export default function GlassAIChatPage() {
           <div className="flex items-center space-x-2 text-sm">
             <Link
               href="/"
-              className="text-slate-400 hover:text-slate-700 transition-colors text-xs font-medium"
+              className="text-slate-400 hover:text-sky-600 transition-colors text-xs font-semibold inline-flex items-center gap-1"
             >
-              ← Beranda
+              <span>← Beranda</span>
             </Link>
             <span className="text-slate-300">/</span>
-            <span className="font-semibold text-slate-900 tracking-tight flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200/90 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Ahmad Kusuma</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
             </span>
-            <span className="text-slate-400">/</span>
-            <span className="text-slate-600 font-medium">Chat 2</span>
+            <span className="text-slate-300">/</span>
+            <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold border border-sky-200/80 shadow-2xs">
+              Chat 2
+            </span>
           </div>
         </div>
 
@@ -458,23 +460,27 @@ export default function GlassAIChatPage() {
         <div className="flex items-center space-x-2.5">
           <button
             onClick={() => setIsRecordModalOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-emerald-200/90 bg-white hover:bg-emerald-50/80 text-emerald-800 hover:border-emerald-300 transition-all shadow-2xs"
           >
-            <Database className="w-3.5 h-3.5 text-slate-500" />
+            <div className="w-4 h-4 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-700">
+              <Database className="w-2.5 h-2.5" />
+            </div>
             <span>Connect health records</span>
             {connectedRecords.length > 0 && (
-              <span className="ml-1 w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-ping"></span>
             )}
           </button>
 
           <button
             onClick={() => setIsDeviceModalOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-sky-200/90 bg-white hover:bg-sky-50/80 text-sky-800 hover:border-sky-300 transition-all shadow-2xs"
           >
-            <Watch className="w-3.5 h-3.5 text-slate-500" />
+            <div className="w-4 h-4 rounded-md bg-sky-100 flex items-center justify-center text-sky-700">
+              <Watch className="w-2.5 h-2.5" />
+            </div>
             <span>Connect a device</span>
             {connectedDevices.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] bg-sky-100 text-sky-700 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-sky-500 text-white font-bold">
                 {connectedDevices.length}
               </span>
             )}
@@ -482,9 +488,9 @@ export default function GlassAIChatPage() {
 
           <button
             onClick={handleNewChat}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white shadow-sm shadow-blue-500/20 transition-all"
           >
-            <Plus className="w-3.5 h-3.5 text-slate-500" />
+            <Plus className="w-3.5 h-3.5" />
             <span>New Chat</span>
           </button>
         </div>
@@ -494,38 +500,49 @@ export default function GlassAIChatPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Pane: AI Chat Column */}
         <div
-          className={`flex flex-col h-full bg-[#fbfbfb] border-r border-slate-200/80 transition-all duration-300 ${
+          className={`flex flex-col h-full bg-white border-r border-sky-100/90 transition-all duration-300 ${
             isExpanded ? 'hidden' : 'w-full md:w-1/2 lg:w-7/12'
           }`}
         >
           {/* Chat Messages Container */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 space-y-6 bg-gradient-to-b from-sky-50/20 via-white to-indigo-50/15">
             {messages.length === 0 ? (
-              // Empty State - Glass Minimalist Greeting
+              // Empty State - Glass Luminous Greeting
               <div className="h-full flex flex-col justify-center items-center text-center px-4 max-w-lg mx-auto">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 mb-4">
-                  <span className="text-xl font-bold font-serif">G</span>
+                <div className="relative mb-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-xl shadow-teal-500/25 ring-4 ring-emerald-100/80">
+                    <Sparkles className="w-8 h-8 text-white drop-shadow-sm" />
+                  </div>
+                  <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white"></span>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 tracking-tight">
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-sky-50 to-emerald-50 border border-sky-200/70 text-sky-900 text-xs font-semibold mb-2 shadow-2xs">
+                  <HeartPulse className="w-3.5 h-3.5 text-rose-500" />
+                  <span>Clinical Decision Intelligence AI</span>
+                </div>
+
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">
                   Sehat AI Clinical Assistant
                 </h3>
-                <p className="mt-2 text-xs sm:text-sm text-slate-500 leading-relaxed">
-                  Konsultasikan keluhan, analisis hasil tes laboratorium, validasi interaksi obat, atau sinkronkan metrik perangkat secara langsung.
+                <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-md">
+                  Konsultasikan keluhan medis, analisis laboratorium kardiometabolik, validasi interaksi farmakoterapi, atau pantau telemetri perangkat secara langsung.
                 </p>
 
-                {/* Status Bar Pills */}
-                <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                    <Database className="w-3 h-3 text-slate-500" />
+                {/* Status Bar Pills with rich vibrant colors */}
+                <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <Database className="w-3.5 h-3.5 text-emerald-600" />
                     <span>{connectedRecords.length > 0 ? 'SatuSehat Connected' : 'SatuSehat Ready'}</span>
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                    <Watch className="w-3 h-3 text-slate-500" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 text-sky-800 border border-sky-200 font-semibold shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
+                    <Watch className="w-3.5 h-3.5 text-sky-600" />
                     <span>{connectedDevices.length > 0 ? `${connectedDevices.length} Perangkat Aktif` : 'Perangkat: Siap Terhubung'}</span>
                   </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                    <FileText className="w-3 h-3 text-slate-500" />
-                    <span>{uploadedDocuments.length} Dokumen</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-800 border border-purple-200 font-semibold shadow-2xs">
+                    <FileText className="w-3.5 h-3.5 text-purple-600" />
+                    <span>{uploadedDocuments.length} Dokumen Medis</span>
                   </span>
                 </div>
               </div>
@@ -539,45 +556,45 @@ export default function GlassAIChatPage() {
                   <div
                     className={`max-w-[88%] rounded-2xl p-4 text-sm leading-relaxed shadow-sm ${
                       msg.sender === 'user'
-                        ? 'bg-slate-900 text-white rounded-br-sm'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm'
+                        ? 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white rounded-br-xs shadow-md shadow-slate-900/10'
+                        : 'bg-white border border-sky-100 text-slate-800 rounded-bl-xs shadow-md shadow-sky-50/50'
                     }`}
                   >
                     {/* Assistant Header Tag */}
                     {msg.sender === 'assistant' && (
-                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 text-xs text-slate-400">
-                        <div className="flex items-center space-x-1.5 text-emerald-700 font-medium">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                          <span>Glass Health Clinical AI</span>
-                          <span className="text-[10px] px-1.5 py-0.2 bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-sky-100 text-xs">
+                        <div className="flex items-center space-x-1.5 text-emerald-800 font-bold">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                          <span>Sehat AI Clinical Assistant</span>
+                          <span className="text-[10px] px-2 py-0.5 bg-gradient-to-r from-emerald-50 to-teal-50 text-teal-800 rounded-full border border-teal-200 font-semibold">
                             {msg.modelUsed || selectedModel}
                           </span>
                         </div>
-                        <span>{msg.timestamp}</span>
+                        <span className="text-slate-400 text-[11px] font-medium">{msg.timestamp}</span>
                       </div>
                     )}
 
                     <div className="whitespace-pre-wrap">{msg.text}</div>
 
-                    {/* Action Cards (e.g. Vitals / Meds / Lab) */}
+                    {/* Action Cards */}
                     {msg.actionCard && (
-                      <div className="mt-3.5 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-                        <div className="flex items-center justify-between font-semibold text-slate-900 mb-1">
-                          <span className="flex items-center gap-1.5">
-                            <Activity className="w-3.5 h-3.5 text-sky-600" />
+                      <div className="mt-3.5 p-3.5 rounded-xl bg-gradient-to-br from-sky-50/80 via-white to-blue-50/60 border border-sky-200/90 text-xs shadow-2xs">
+                        <div className="flex items-center justify-between font-bold text-slate-900 mb-1.5">
+                          <span className="flex items-center gap-1.5 text-sky-900">
+                            <Activity className="w-4 h-4 text-sky-600" />
                             {msg.actionCard.title}
                           </span>
-                          <span className="text-[10px] uppercase tracking-wider text-sky-600 font-bold bg-sky-50 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] uppercase tracking-wider text-sky-700 font-bold bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200">
                             {msg.actionCard.type}
                           </span>
                         </div>
-                        <p className="text-slate-600 mb-2">{msg.actionCard.description}</p>
+                        <p className="text-slate-600 mb-2.5 leading-relaxed">{msg.actionCard.description}</p>
                         {msg.actionCard.data && (
-                          <div className="grid grid-cols-2 gap-1.5 bg-white p-2 rounded-lg border border-slate-200/60">
+                          <div className="grid grid-cols-2 gap-2 bg-white/90 p-2.5 rounded-lg border border-sky-100">
                             {Object.entries(msg.actionCard.data).map(([key, val]) => (
                               <div key={key}>
-                                <span className="text-slate-400 block text-[10px]">{key}</span>
-                                <span className="font-medium text-slate-800">{val}</span>
+                                <span className="text-slate-400 block text-[10px] font-medium">{key}</span>
+                                <span className="font-bold text-slate-800">{val}</span>
                               </div>
                             ))}
                           </div>
@@ -588,15 +605,15 @@ export default function GlassAIChatPage() {
                     {/* Clinical Citations */}
                     {msg.citations && msg.citations.length > 0 && (
                       <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap gap-1.5 items-center">
-                        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
-                          Evidence:
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">
+                          Bukti Klinis:
                         </span>
                         {msg.citations.map((cite, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium border border-slate-200/60 inline-flex items-center gap-1"
+                            className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200 inline-flex items-center gap-1 shadow-2xs"
                           >
-                            <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
+                            <ExternalLink className="w-2.5 h-2.5 text-emerald-600" />
                             {cite}
                           </span>
                         ))}
@@ -609,11 +626,11 @@ export default function GlassAIChatPage() {
 
             {/* Live Typing / Generation Indicator */}
             {isGenerating && (
-              <div className="flex items-center space-x-2 text-slate-400 text-xs py-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse delay-75"></div>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse delay-150"></div>
-                <span className="ml-2 font-medium text-slate-500">Menganalisis bukti klinis & metrik...</span>
+              <div className="flex items-center space-x-2 text-sky-700 text-xs py-2 bg-sky-50/60 px-3 rounded-full border border-sky-200 w-fit">
+                <div className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
+                <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse delay-75"></div>
+                <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse delay-150"></div>
+                <span className="ml-1 font-semibold">Menganalisis bukti klinis, formularium & telemetri...</span>
               </div>
             )}
 
@@ -621,46 +638,54 @@ export default function GlassAIChatPage() {
           </div>
 
           {/* Bottom Chat Bar Area (With Suggestion Chips & Prompt Input) */}
-          <div className="p-4 bg-white border-t border-slate-200/70">
-            {/* Quick Prompt Suggestion Chips (Exact match to Glass screenshot) */}
+          <div className="p-4 bg-white/95 backdrop-blur-md border-t border-sky-100/90 shadow-lg shadow-sky-100/20">
+            {/* Quick Prompt Suggestion Chips - VIBRANT & COLORFUL */}
             <div className="flex items-center space-x-2 overflow-x-auto pb-3 mb-1 no-scrollbar text-xs">
               <button
                 onClick={() => handleQuickChip('Tolong jelaskan hasil tes laboratorium darah lengkap dan kardiometabolik terbaru')}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 whitespace-nowrap transition-colors shadow-2xs"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-amber-200/90 bg-amber-50/80 hover:bg-amber-100 text-amber-900 font-semibold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
               >
-                <FlaskConical className="w-3.5 h-3.5 text-slate-500" />
+                <FlaskConical className="w-3.5 h-3.5 text-amber-600" />
                 <span>Understand a test result</span>
               </button>
 
               <button
                 onClick={() => handleQuickChip('Pasien mengeluhkan pusing dan lemas di sore hari setelah aktivitas ringan. Evaluasi kemungkinan etiologi')}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 whitespace-nowrap transition-colors shadow-2xs"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-rose-200/90 bg-rose-50/80 hover:bg-rose-100 text-rose-900 font-semibold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
               >
-                <Stethoscope className="w-3.5 h-3.5 text-slate-500" />
+                <Stethoscope className="w-3.5 h-3.5 text-rose-600" />
                 <span>Review a symptom</span>
               </button>
 
               <button
                 onClick={() => handleQuickChip('Evaluasi interaksi obat Amlodipine 5mg dan Metformin 500mg, serta panduan kepatuhan konsumsi')}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 whitespace-nowrap transition-colors shadow-2xs"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-sky-200/90 bg-sky-50/80 hover:bg-sky-100 text-sky-900 font-semibold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
               >
-                <Pill className="w-3.5 h-3.5 text-slate-500" />
+                <Pill className="w-3.5 h-3.5 text-sky-600" />
                 <span>Understand a medication</span>
-                <ArrowRight className="w-3 h-3 text-slate-400" />
+                <ArrowRight className="w-3 h-3 text-sky-500" />
+              </button>
+
+              <button
+                onClick={() => handleQuickChip('Sinkronkan dan evaluasi telemetri tensi OMRON serta detak jantung terkini')}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-teal-200/90 bg-teal-50/80 hover:bg-teal-100 text-teal-900 font-semibold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
+              >
+                <Activity className="w-3.5 h-3.5 text-teal-600" />
+                <span>Telemetri Vital Sign</span>
               </button>
             </div>
 
             {/* Audio Waveform Banner when Ambient Recording Active */}
             {isRecordingAudio && (
-              <div className="mb-2 p-2.5 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs text-blue-900 animate-pulse">
+              <div className="mb-2.5 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 flex items-center justify-between text-xs text-blue-900 animate-pulse shadow-sm">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping"></div>
-                  <span className="font-semibold">Ambient Clinical Voice Active</span>
+                  <div className="w-3 h-3 rounded-full bg-blue-600 animate-ping"></div>
+                  <span className="font-bold">Ambient Clinical Voice Active</span>
                   <span className="text-blue-700 italic">{audioTranscript}</span>
                 </div>
                 <button
                   onClick={toggleAmbientAudio}
-                  className="px-2 py-0.5 rounded bg-blue-600 text-white font-medium hover:bg-blue-700"
+                  className="px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-xs"
                 >
                   Selesai
                 </button>
@@ -668,10 +693,10 @@ export default function GlassAIChatPage() {
             )}
 
             {/* Glass-Style Prompt Box Container */}
-            <div className="relative rounded-2xl border border-slate-300 bg-white shadow-sm focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100 transition-all p-3">
+            <div className="relative rounded-2xl border border-sky-200 bg-white shadow-md shadow-sky-100/50 focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-100/70 transition-all p-3">
               {/* Brand Logo Watermark on Top-Right */}
               <div className="absolute top-3 right-3 select-none pointer-events-none">
-                <div className="w-5 h-5 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[10px] font-bold font-serif shadow-xs">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-[11px] font-bold font-serif shadow-xs">
                   G
                 </div>
               </div>
@@ -686,22 +711,22 @@ export default function GlassAIChatPage() {
                     handleSendMessage();
                   }
                 }}
-                placeholder="How else can I help?"
+                placeholder="Konsultasikan gejala klinis, interpretasi data medis, atau instruksi DPJP..."
                 rows={2}
-                className="w-full pr-8 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent"
+                className="w-full pr-8 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none resize-none bg-transparent leading-relaxed"
               />
 
-              {/* Bottom Controls Row inside Input Box (Faithful to Screenshot) */}
+              {/* Bottom Controls Row inside Input Box */}
               <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-1">
                 {/* Left Action Buttons: Waveform Voice & Document Attach */}
                 <div className="flex items-center space-x-1.5">
                   <button
                     type="button"
                     onClick={toggleAmbientAudio}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
                       isRecordingAudio
                         ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 animate-pulse'
-                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-600/20'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm shadow-blue-600/25'
                     }`}
                     title="Ambient Voice Recording"
                   >
@@ -711,7 +736,7 @@ export default function GlassAIChatPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors"
+                    className="w-8 h-8 rounded-xl border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-colors"
                     title="Attach File / Lab Result"
                   >
                     <Paperclip className="w-4 h-4" />
@@ -732,14 +757,14 @@ export default function GlassAIChatPage() {
                     <button
                       type="button"
                       onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                      className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-medium rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                      className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-sky-50 text-sky-800 hover:bg-sky-100 border border-sky-200 transition-colors"
                     >
                       <span>{selectedModel}</span>
-                      <ChevronDown className="w-3 h-3 text-slate-500" />
+                      <ChevronDown className="w-3 h-3 text-sky-600" />
                     </button>
 
                     {isModelDropdownOpen && (
-                      <div className="absolute right-0 bottom-full mb-1.5 w-48 rounded-xl bg-white border border-slate-200 shadow-lg py-1.5 z-40 text-xs">
+                      <div className="absolute right-0 bottom-full mb-1.5 w-52 rounded-xl bg-white border border-sky-200 shadow-xl py-1.5 z-40 text-xs">
                         <button
                           type="button"
                           onClick={() => {
@@ -747,14 +772,14 @@ export default function GlassAIChatPage() {
                             setIsModelDropdownOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between ${
-                            selectedModel === 'Standard' ? 'font-semibold text-emerald-700 bg-emerald-50/50' : 'text-slate-700'
+                            selectedModel === 'Standard' ? 'font-bold text-teal-800 bg-teal-50/60' : 'text-slate-700'
                           }`}
                         >
                           <div>
-                            <div>Standard</div>
+                            <div className="font-semibold">Standard</div>
                             <div className="text-[10px] text-slate-400">Fast clinical assistant</div>
                           </div>
-                          {selectedModel === 'Standard' && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                          {selectedModel === 'Standard' && <Check className="w-3.5 h-3.5 text-teal-600" />}
                         </button>
                         <button
                           type="button"
@@ -763,14 +788,14 @@ export default function GlassAIChatPage() {
                             setIsModelDropdownOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between ${
-                            selectedModel === 'Clinical Pro' ? 'font-semibold text-emerald-700 bg-emerald-50/50' : 'text-slate-700'
+                            selectedModel === 'Clinical Pro' ? 'font-bold text-teal-800 bg-teal-50/60' : 'text-slate-700'
                           }`}
                         >
                           <div>
-                            <div>Clinical Pro (MedX)</div>
+                            <div className="font-semibold">Clinical Pro (MedX)</div>
                             <div className="text-[10px] text-slate-400">Differential Diagnosis & DDx</div>
                           </div>
-                          {selectedModel === 'Clinical Pro' && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                          {selectedModel === 'Clinical Pro' && <Check className="w-3.5 h-3.5 text-teal-600" />}
                         </button>
                         <button
                           type="button"
@@ -779,14 +804,14 @@ export default function GlassAIChatPage() {
                             setIsModelDropdownOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center justify-between ${
-                            selectedModel === 'Evidence RAG' ? 'font-semibold text-emerald-700 bg-emerald-50/50' : 'text-slate-700'
+                            selectedModel === 'Evidence RAG' ? 'font-bold text-teal-800 bg-teal-50/60' : 'text-slate-700'
                           }`}
                         >
                           <div>
-                            <div>Evidence RAG</div>
+                            <div className="font-semibold">Evidence RAG</div>
                             <div className="text-[10px] text-slate-400">PubMed & Guideline Citations</div>
                           </div>
-                          {selectedModel === 'Evidence RAG' && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                          {selectedModel === 'Evidence RAG' && <Check className="w-3.5 h-3.5 text-teal-600" />}
                         </button>
                       </div>
                     )}
@@ -797,21 +822,21 @@ export default function GlassAIChatPage() {
                     <button
                       type="button"
                       onClick={() => setIsTemplateMenuOpen(!isTemplateMenuOpen)}
-                      className="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 flex items-center justify-center transition-colors"
                       title="Insert Clinical Template"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
 
                     {isTemplateMenuOpen && (
-                      <div className="absolute right-0 bottom-full mb-1.5 w-52 rounded-xl bg-white border border-slate-200 shadow-lg py-1.5 z-40 text-xs">
+                      <div className="absolute right-0 bottom-full mb-1.5 w-56 rounded-xl bg-white border border-amber-200 shadow-xl py-1.5 z-40 text-xs">
                         <button
                           type="button"
                           onClick={() => {
                             setInputMessage('Keluhan Utama: Nyeri dada tumpul saat aktivitas, durasi 10 menit, membaik saat istirahat.');
                             setIsTemplateMenuOpen(false);
                           }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-50 text-slate-700"
+                          className="w-full text-left px-3 py-2 hover:bg-amber-50/60 text-slate-700 font-medium"
                         >
                           + Template Keluhan Utama
                         </button>
@@ -821,7 +846,7 @@ export default function GlassAIChatPage() {
                             setInputMessage('Observasi Hemodinamik: TD 118/76 mmHg, HR 72 bpm, RR 18 x/m, SpO2 98%, Suhu 36.6 C.');
                             setIsTemplateMenuOpen(false);
                           }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-50 text-slate-700"
+                          className="w-full text-left px-3 py-2 hover:bg-amber-50/60 text-slate-700 font-medium"
                         >
                           + Template Tanda Vital
                         </button>
@@ -831,7 +856,7 @@ export default function GlassAIChatPage() {
                             setInputMessage('Daftar Obat Terkini: Amlodipine 5mg 1x1, Metformin 500mg 2x1. Cek kepatuhan dan kontraindikasi.');
                             setIsTemplateMenuOpen(false);
                           }}
-                          className="w-full text-left px-3 py-2 hover:bg-slate-50 text-slate-700"
+                          className="w-full text-left px-3 py-2 hover:bg-amber-50/60 text-slate-700 font-medium"
                         >
                           + Template Regimen Obat
                         </button>
@@ -843,7 +868,7 @@ export default function GlassAIChatPage() {
                   <button
                     type="button"
                     onClick={toggleAmbientAudio}
-                    className="w-8 h-8 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-colors"
+                    className="w-8 h-8 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 flex items-center justify-center transition-colors"
                     title="Voice Input"
                   >
                     <Mic className="w-4 h-4" />
@@ -856,12 +881,12 @@ export default function GlassAIChatPage() {
                     disabled={!inputMessage.trim()}
                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
                       inputMessage.trim()
-                        ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
+                        ? 'bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white shadow-md shadow-sky-500/25'
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                     }`}
                     title="Send Message"
                   >
-                    <ArrowUp className="w-4 h-4" />
+                    <ArrowUp className="w-4 h-4 font-bold" />
                   </button>
                 </div>
               </div>
@@ -869,53 +894,62 @@ export default function GlassAIChatPage() {
           </div>
         </div>
 
-        {/* Right Pane: Data, Documents & Patient Summary Inspector (Faithful to Screenshot) */}
+        {/* Right Pane: Data, Documents & Profile Inspector */}
         <div
           className={`flex flex-col h-full bg-white transition-all duration-300 ${
             isExpanded ? 'w-full' : 'w-full md:w-1/2 lg:w-5/12'
           }`}
         >
           {/* Right Pane Header Tabs */}
-          <div className="h-12 border-b border-slate-200/80 px-4 flex items-center justify-between bg-white select-none">
-            <div className="flex items-center space-x-1">
+          <div className="h-14 border-b border-sky-100/90 px-4 sm:px-6 flex items-center justify-between bg-white select-none shadow-2xs">
+            <div className="flex items-center space-x-1.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200/60">
               <button
                 onClick={() => setActiveTab('patient')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   activeTab === 'patient'
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-sm shadow-blue-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
                 }`}
               >
-                Profile
+                <User className="w-3.5 h-3.5" />
+                <span>Profile</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('data')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   activeTab === 'data'
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm shadow-emerald-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
                 }`}
               >
-                Data
+                <Activity className="w-3.5 h-3.5" />
+                <span>Data</span>
+                {(connectedDevices.length > 0 || connectedRecords.length > 0) && (
+                  <span className="w-2 h-2 rounded-full bg-white inline-block"></span>
+                )}
               </button>
 
               <button
                 onClick={() => setActiveTab('documents')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
                   activeTab === 'documents'
-                    ? 'bg-slate-100 text-slate-900'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-sm shadow-purple-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
                 }`}
               >
-                Documents
+                <FileText className="w-3.5 h-3.5" />
+                <span>Documents</span>
+                {(uploadedDocuments.length > 0 || generatedFiles.length > 0) && (
+                  <span className="w-2 h-2 rounded-full bg-white inline-block"></span>
+                )}
               </button>
             </div>
 
             {/* Expand / Minimize Fullscreen Toggle */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors border border-transparent hover:border-sky-100"
               title={isExpanded ? 'Minimize View' : 'Expand View'}
             >
               {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -923,39 +957,39 @@ export default function GlassAIChatPage() {
           </div>
 
           {/* Right Pane Content Area */}
-          <div className="flex-1 overflow-y-auto p-6 bg-white space-y-6">
-            {/* TAB 1: DATA (Exact match to Image 2) */}
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 bg-gradient-to-b from-slate-50/40 via-white to-sky-50/20 space-y-5">
+            {/* TAB 1: DATA */}
             {activeTab === 'data' && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {/* Header & Subtitle */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900 tracking-tight">Data Overview</h2>
+                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Data Overview</h2>
                     <p className="text-xs text-slate-500 mt-0.5">
                       {connectedDevices.length === 0 && connectedRecords.length === 0
                         ? 'No data connected yet'
-                        : `${connectedDevices.length} device(s) & ${connectedRecords.length} record(s) synced`}
+                        : `${connectedDevices.length} peranti aktif • ${connectedRecords.length} berkas FHIR tersinkronisasi`}
                     </p>
                   </div>
 
                   {/* Filter Pills: Metrics vs Health Records */}
-                  <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs">
+                  <div className="inline-flex rounded-xl border border-sky-200/80 p-0.5 bg-sky-50/50 text-xs">
                     <button
                       onClick={() => setDataSubFilter('metrics')}
-                      className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-lg font-bold transition-all ${
                         dataSubFilter === 'metrics'
-                          ? 'bg-white text-slate-900 shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-900'
+                          ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Metrics
                     </button>
                     <button
                       onClick={() => setDataSubFilter('records')}
-                      className={`px-3 py-1 rounded-md font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-lg font-bold transition-all ${
                         dataSubFilter === 'records'
-                          ? 'bg-white text-slate-900 shadow-2xs'
-                          : 'text-slate-500 hover:text-slate-900'
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       Health records
@@ -965,50 +999,58 @@ export default function GlassAIChatPage() {
 
                 {/* Metrics Sub-view */}
                 {dataSubFilter === 'metrics' && (
-                  <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                      <span className="text-sm font-semibold text-slate-900">Metrics</span>
+                  <div className="rounded-2xl border border-sky-100/90 p-5 bg-white shadow-sm">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                      <div className="flex items-center space-x-2">
+                        <Activity className="w-4 h-4 text-sky-600" />
+                        <span className="text-sm font-bold text-slate-900">Live Clinical Metrics</span>
+                      </div>
                       <button
                         onClick={() => setIsDeviceModalOpen(true)}
-                        className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                        className="text-xs font-bold px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition-colors"
                       >
-                        Connect
+                        + Hubungkan Perangkat
                       </button>
                     </div>
 
                     {connectedDevices.length === 0 ? (
                       <div className="py-8 text-center">
-                        <p className="text-sm font-medium text-slate-700">No connected sources yet.</p>
-                        <p className="text-xs text-slate-400 mt-1">Connect your device to get started.</p>
+                        <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600 mx-auto mb-3 shadow-2xs">
+                          <Watch className="w-6 h-6" />
+                        </div>
+                        <p className="text-sm font-bold text-slate-800">No connected sources yet.</p>
+                        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                          Hubungkan OMRON Complete, Apple Watch, CGM Dexcom, atau Aolon GT6 Pro via Google Health Connect.
+                        </p>
                         <button
                           onClick={() => setIsDeviceModalOpen(true)}
-                          className="mt-4 px-3.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
+                          className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-bold transition-all shadow-sm shadow-sky-500/20 inline-flex items-center gap-1.5"
                         >
                           <Watch className="w-3.5 h-3.5" />
-                          <span>Hubungkan Perangkat</span>
+                          <span>Hubungkan Perangkat Sekarang</span>
                         </button>
                       </div>
                     ) : (
                       <div className="divide-y divide-slate-100 mt-2">
                         {connectedDevices.map((dev) => (
-                          <div key={dev.id} className="py-3 flex items-center justify-between">
-                            <div className="space-y-0.5">
+                          <div key={dev.id} className="py-3.5 flex items-center justify-between">
+                            <div className="space-y-1">
                               <div className="flex items-center space-x-2">
-                                <span className="text-xs font-semibold text-slate-900">{dev.name}</span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+                                <span className="text-xs font-bold text-slate-900">{dev.name}</span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
                                   {dev.statusBadge}
                                 </span>
                               </div>
-                              <div className="text-xs text-slate-500">
-                                {dev.metricLabel}: <span className="font-bold text-slate-800">{dev.metricValue}</span> {dev.metricUnit}
+                              <div className="text-xs text-slate-600">
+                                {dev.metricLabel}: <span className="font-extrabold text-blue-600">{dev.metricValue}</span> {dev.metricUnit}
                               </div>
                             </div>
-                            <div className="text-right text-[11px] text-slate-400 flex items-center gap-2">
-                              <span className="flex items-center gap-1">
-                                <Battery className="w-3 h-3 text-slate-400" />
+                            <div className="text-right text-[11px] text-slate-500 flex items-center gap-2">
+                              <span className="flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <Battery className="w-3 h-3 text-emerald-600" />
                                 {dev.battery}%
                               </span>
-                              <span>• {dev.lastSync}</span>
+                              <span className="text-slate-400">• {dev.lastSync}</span>
                             </div>
                           </div>
                         ))}
@@ -1019,24 +1061,32 @@ export default function GlassAIChatPage() {
 
                 {/* Health Records Sub-view */}
                 {dataSubFilter === 'records' && (
-                  <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                      <span className="text-sm font-semibold text-slate-900">Health Records (FHIR R4)</span>
+                  <div className="rounded-2xl border border-emerald-100/90 p-5 bg-white shadow-sm">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                      <div className="flex items-center space-x-2">
+                        <Database className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-bold text-slate-900">Health Records (HL7 FHIR R4)</span>
+                      </div>
                       <button
                         onClick={() => setIsRecordModalOpen(true)}
-                        className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                        className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition-colors"
                       >
-                        Connect
+                        + Sync SatuSehat
                       </button>
                     </div>
 
                     {connectedRecords.length === 0 ? (
                       <div className="py-8 text-center">
-                        <p className="text-sm font-medium text-slate-700">No connected health records yet.</p>
-                        <p className="text-xs text-slate-400 mt-1">Connect your SatuSehat or hospital EMR portal to get started.</p>
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto mb-3 shadow-2xs">
+                          <Database className="w-6 h-6" />
+                        </div>
+                        <p className="text-sm font-bold text-slate-800">No connected health records yet.</p>
+                        <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                          Sinkronkan riwayat encounter rumah sakit, resume laboratorium, dan resep via IHS Kemenkes RI.
+                        </p>
                         <button
                           onClick={() => setIsRecordModalOpen(true)}
-                          className="mt-4 px-3.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold transition-colors inline-flex items-center gap-1.5"
+                          className="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-500/20 inline-flex items-center gap-1.5"
                         >
                           <Database className="w-3.5 h-3.5" />
                           <span>Hubungkan SatuSehat Kemenkes</span>
@@ -1045,20 +1095,20 @@ export default function GlassAIChatPage() {
                     ) : (
                       <div className="divide-y divide-slate-100 mt-2">
                         {connectedRecords.map((rec) => (
-                          <div key={rec.id} className="py-3 flex items-center justify-between">
-                            <div className="space-y-0.5">
+                          <div key={rec.id} className="py-3.5 flex items-center justify-between">
+                            <div className="space-y-1">
                               <div className="flex items-center space-x-2">
-                                <span className="text-xs font-semibold text-slate-900">{rec.provider}</span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+                                <span className="text-xs font-bold text-slate-900">{rec.provider}</span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold">
                                   {rec.type}
                                 </span>
                               </div>
-                              <div className="text-xs text-slate-500">
-                                Encounter: <span className="font-mono font-medium text-slate-700">{rec.encounterId}</span> • HL7 {rec.fhirVersion}
+                              <div className="text-xs text-slate-600">
+                                Encounter ID: <span className="font-mono font-bold text-slate-800">{rec.encounterId}</span> • HL7 {rec.fhirVersion}
                               </div>
                             </div>
-                            <div className="text-right text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            <div className="text-right text-[11px] text-emerald-700 font-bold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               <span>Tersinkronisasi</span>
                             </div>
                           </div>
@@ -1070,39 +1120,52 @@ export default function GlassAIChatPage() {
               </div>
             )}
 
-            {/* TAB 2: DOCUMENTS (Exact match to Image 1 & 3) */}
+            {/* TAB 2: DOCUMENTS */}
             {activeTab === 'documents' && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {/* Header & Subtitle */}
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900 tracking-tight">Documents Overview</h2>
+                  <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Documents Overview</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     {uploadedDocuments.length === 0 && generatedFiles.length === 0
                       ? 'No documents available yet'
-                      : `${uploadedDocuments.length + generatedFiles.length} berkas klinis tersedia`}
+                      : `${uploadedDocuments.length + generatedFiles.length} berkas klinis tersedia dalam format standar`}
                   </p>
                 </div>
 
                 {/* Card 1: Documents (Connected Health Records) */}
-                <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs">
-                  <div className="pb-3 border-b border-slate-100">
-                    <span className="text-sm font-semibold text-slate-900">Documents</span>
+                <div className="rounded-2xl border border-sky-100/90 p-5 bg-white shadow-sm">
+                  <div className="pb-3 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <FileCheck className="w-4 h-4 text-emerald-600" />
+                      <span className="text-sm font-bold text-slate-900">Documents</span>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+                      FHIR DiagnosticReport
+                    </span>
                   </div>
 
                   {connectedRecords.length === 0 ? (
                     <div className="py-6">
-                      <p className="text-sm font-medium text-slate-700">No connected health records yet.</p>
+                      <p className="text-sm font-semibold text-slate-700">No connected health records yet.</p>
                       <p className="text-xs text-slate-400 mt-0.5">Connect your health records to get started.</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-slate-100 mt-2">
                       {connectedRecords.map((rec) => (
-                        <div key={rec.id} className="py-2.5 flex items-center justify-between text-xs">
+                        <div key={rec.id} className="py-3 flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-2">
-                            <FileText className="w-4 h-4 text-emerald-600" />
-                            <span className="font-medium text-slate-800">{rec.provider} Clinical Summary.pdf</span>
+                            <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                              <FileText className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <span className="font-bold text-slate-800">{rec.provider} Clinical Summary.pdf</span>
+                              <div className="text-[10px] text-slate-400">Terverifikasi Kemenkes RI • 1.8 MB</div>
+                            </div>
                           </div>
-                          <span className="text-slate-400 font-mono text-[11px]">Synced</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-[10px]">
+                            Synced
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -1110,21 +1173,24 @@ export default function GlassAIChatPage() {
                 </div>
 
                 {/* Card 2: Uploads (With + Upload Button) */}
-                <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs">
+                <div className="rounded-2xl border border-violet-100/90 p-5 bg-white shadow-sm">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <span className="text-sm font-semibold text-slate-900">Uploads</span>
+                    <div className="flex items-center space-x-2">
+                      <Upload className="w-4 h-4 text-violet-600" />
+                      <span className="text-sm font-bold text-slate-900">Uploads</span>
+                    </div>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors"
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700 text-xs font-bold transition-all shadow-xs shadow-violet-500/20"
                     >
-                      <Upload className="w-3.5 h-3.5 text-slate-500" />
+                      <Upload className="w-3.5 h-3.5" />
                       <span>Upload</span>
                     </button>
                   </div>
 
                   {uploadedDocuments.length === 0 ? (
                     <div className="py-6">
-                      <p className="text-sm font-medium text-slate-700">No uploaded files yet.</p>
+                      <p className="text-sm font-semibold text-slate-700">No uploaded files yet.</p>
                       <p className="text-xs text-slate-400 mt-0.5">Upload a file to get started.</p>
                     </div>
                   ) : (
@@ -1133,16 +1199,16 @@ export default function GlassAIChatPage() {
                         <div key={doc.id} className="py-3 flex items-center justify-between">
                           <div className="space-y-0.5">
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs font-semibold text-slate-900">{doc.name}</span>
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium">
+                              <span className="text-xs font-bold text-slate-900">{doc.name}</span>
+                              <span className="text-[10px] px-2 py-0.2 rounded-full bg-violet-50 text-violet-800 font-semibold border border-violet-200">
                                 {doc.size}
                               </span>
                             </div>
-                            <div className="text-[11px] text-slate-400">
+                            <div className="text-[11px] text-slate-500">
                               {doc.uploadedAt} • OCR Extracted
                             </div>
                           </div>
-                          <span className="text-xs text-blue-600 font-semibold cursor-pointer hover:underline">
+                          <span className="text-xs text-violet-700 font-bold cursor-pointer hover:underline">
                             Lihat
                           </span>
                         </div>
@@ -1152,12 +1218,15 @@ export default function GlassAIChatPage() {
                 </div>
 
                 {/* Card 3: Created by Glass / Sehat AI */}
-                <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs">
+                <div className="rounded-2xl border border-sky-100/90 p-5 bg-white shadow-sm">
                   <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                    <span className="text-sm font-semibold text-slate-900">Created by Glass</span>
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 text-sky-600" />
+                      <span className="text-sm font-bold text-slate-900">Created by Glass</span>
+                    </div>
                     <button
                       onClick={handleGenerateAIFile}
-                      className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded text-xs font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+                      className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white text-xs font-bold transition-all shadow-xs shadow-blue-500/20"
                     >
                       <FilePlus className="w-3.5 h-3.5" />
                       <span>Create file</span>
@@ -1166,7 +1235,7 @@ export default function GlassAIChatPage() {
 
                   {generatedFiles.length === 0 ? (
                     <div className="py-6">
-                      <p className="text-sm font-medium text-slate-700">No generated files yet.</p>
+                      <p className="text-sm font-semibold text-slate-700">No generated files yet.</p>
                       <p className="text-xs text-slate-400 mt-0.5">Create a file to get started.</p>
                     </div>
                   ) : (
@@ -1174,12 +1243,12 @@ export default function GlassAIChatPage() {
                       {generatedFiles.map((file) => (
                         <div key={file.id} className="py-3 flex items-center justify-between">
                           <div className="space-y-0.5">
-                            <span className="text-xs font-semibold text-slate-900">{file.title}</span>
-                            <div className="text-[11px] text-slate-400">
+                            <span className="text-xs font-bold text-slate-900">{file.title}</span>
+                            <div className="text-[11px] text-slate-500">
                               {file.category} • {file.size}
                             </div>
                           </div>
-                          <button className="text-xs text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1">
+                          <button className="text-xs text-blue-700 hover:text-blue-900 font-bold inline-flex items-center gap-1 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200">
                             <Download className="w-3.5 h-3.5" />
                             <span>Unduh</span>
                           </button>
@@ -1191,14 +1260,14 @@ export default function GlassAIChatPage() {
               </div>
             )}
 
-            {/* TAB 3: PROFILE (Patient Profile & Encounter Overview - Glass Health UI) */}
+            {/* TAB 3: PROFILE (Patient Profile & Encounter Overview) */}
             {activeTab === 'patient' && (
               <div className="space-y-4">
-                {/* Header (Faithful to Screenshot) */}
+                {/* Header */}
                 <div className="flex items-center justify-between pb-1">
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Patient Overview</h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Patient Overview</h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
                       {isOverviewGenerated
                         ? 'Overview generated • 3 sources synced'
                         : 'No overview generated yet'}
@@ -1206,40 +1275,43 @@ export default function GlassAIChatPage() {
                   </div>
                   <button
                     onClick={handleRefreshOverview}
-                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200/60 shadow-2xs"
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-sky-800 bg-sky-50 hover:bg-sky-100 rounded-xl transition-all border border-sky-200 shadow-2xs"
                     title="Refresh Patient Overview"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isRefreshingOverview ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 text-sky-600 ${isRefreshingOverview ? 'animate-spin' : ''}`} />
                     <span>Refresh</span>
                   </button>
                 </div>
 
-                {/* 2-Column Responsive Grid (Exact Match to Screenshot) */}
+                {/* 2-Column Responsive Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Left Column: Digital Twin & Health History */}
                   <div className="space-y-4 flex flex-col">
                     {/* Card 1: Digital Twin */}
-                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs flex-1 flex flex-col">
+                    <div className="rounded-2xl border border-sky-200/80 p-4 bg-gradient-to-b from-sky-50/40 via-white to-blue-50/30 shadow-sm flex-1 flex flex-col">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-slate-800">Digital Twin</span>
+                        <div className="flex items-center space-x-1.5">
+                          <Activity className="w-3.5 h-3.5 text-sky-600" />
+                          <span className="text-xs font-bold text-slate-900">Digital Twin 3D</span>
+                        </div>
                         {selectedOrgan && (
-                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 animate-in fade-in">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200 animate-in fade-in">
                             {selectedOrgan}
                           </span>
                         )}
                       </div>
 
-                      {/* Holographic 3D Human Body Silhouette SVG */}
-                      <div className="flex-1 flex flex-col items-center justify-center py-2 relative min-h-[310px] select-none">
+                      {/* Holographic 3D Human Body Silhouette SVG with vibrant medical neon glows */}
+                      <div className="flex-1 flex flex-col items-center justify-center py-2 relative min-h-[300px] select-none">
                         <svg
                           viewBox="0 0 200 360"
                           className="w-48 h-72 sm:h-80 drop-shadow-md transition-transform hover:scale-102 duration-300"
                         >
                           <defs>
                             <linearGradient id="bodyGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
-                              <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.65" />
-                              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.5" />
+                              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.55" />
+                              <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.75" />
+                              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.6" />
                             </linearGradient>
                             <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
                               <stop offset="0%" stopColor="#ff4d6d" stopOpacity="0.95" />
@@ -1247,12 +1319,12 @@ export default function GlassAIChatPage() {
                               <stop offset="100%" stopColor="#be123c" stopOpacity="0.1" />
                             </radialGradient>
                             <radialGradient id="brainGlow" cx="50%" cy="50%" r="50%">
-                              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.9" />
-                              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.2" />
+                              <stop offset="0%" stopColor="#c084fc" stopOpacity="0.95" />
+                              <stop offset="100%" stopColor="#7e22ce" stopOpacity="0.2" />
                             </radialGradient>
                             <radialGradient id="metabolicGlow" cx="50%" cy="50%" r="50%">
-                              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
-                              <stop offset="100%" stopColor="#0369a1" stopOpacity="0.1" />
+                              <stop offset="0%" stopColor="#34d399" stopOpacity="0.9" />
+                              <stop offset="100%" stopColor="#059669" stopOpacity="0.1" />
                             </radialGradient>
                             <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
                               <feGaussianBlur stdDeviation="3" result="blur" />
@@ -1261,7 +1333,7 @@ export default function GlassAIChatPage() {
                           </defs>
 
                           {/* Aura Background Glow */}
-                          <ellipse cx="100" cy="180" rx="45" ry="140" fill="#38bdf8" opacity="0.08" filter="url(#softGlow)" />
+                          <ellipse cx="100" cy="180" rx="45" ry="140" fill="#38bdf8" opacity="0.12" filter="url(#softGlow)" />
 
                           {/* Head */}
                           <ellipse cx="100" cy="38" rx="14" ry="18" fill="url(#bodyGlow)" stroke="#7dd3fc" strokeWidth="1" />
@@ -1283,31 +1355,31 @@ export default function GlassAIChatPage() {
                             fill="url(#bodyGlow)"
                             stroke="#38bdf8"
                             strokeWidth="1.2"
-                            strokeOpacity="0.7"
+                            strokeOpacity="0.8"
                           />
 
                           {/* Translucent Ribcage lines */}
-                          <path d="M85 88 C95 84, 105 84, 115 88" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
-                          <path d="M82 98 C94 94, 106 94, 118 98" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
-                          <path d="M84 108 C94 104, 106 104, 116 108" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
-                          <path d="M86 118 C94 114, 106 114, 114 118" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
+                          <path d="M85 88 C95 84, 105 84, 115 88" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.7" fill="none" />
+                          <path d="M82 98 C94 94, 106 94, 118 98" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.7" fill="none" />
+                          <path d="M84 108 C94 104, 106 104, 116 108" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.7" fill="none" />
+                          <path d="M86 118 C94 114, 106 114, 114 118" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.7" fill="none" />
 
                           {/* Spinal Column */}
-                          <line x1="100" y1="65" x2="100" y2="185" stroke="#e0f2fe" strokeWidth="1.5" strokeDasharray="3 2" strokeOpacity="0.5" />
+                          <line x1="100" y1="65" x2="100" y2="185" stroke="#e0f2fe" strokeWidth="1.5" strokeDasharray="3 2" strokeOpacity="0.6" />
 
                           {/* Lungs Silhouette */}
                           <path
                             d="M86 85 C82 95, 82 115, 88 120 C92 120, 95 105, 95 90 Z"
                             fill="#0284c7"
-                            fillOpacity="0.25"
-                            className="cursor-pointer hover:fill-opacity-40"
+                            fillOpacity="0.35"
+                            className="cursor-pointer hover:fill-opacity-50"
                             onClick={() => setSelectedOrgan('Respiratory: SpO2 98% • RR 16 x/min')}
                           />
                           <path
                             d="M114 85 C118 95, 118 115, 112 120 C108 120, 105 105, 105 90 Z"
                             fill="#0284c7"
-                            fillOpacity="0.25"
-                            className="cursor-pointer hover:fill-opacity-40"
+                            fillOpacity="0.35"
+                            className="cursor-pointer hover:fill-opacity-50"
                             onClick={() => setSelectedOrgan('Respiratory: SpO2 98% • RR 16 x/min')}
                           />
 
@@ -1332,82 +1404,105 @@ export default function GlassAIChatPage() {
                           />
 
                           {/* Arms */}
-                          {/* Left Arm */}
                           <path
                             d="M68 76 C62 90, 58 115, 56 140 C54 160, 50 185, 48 205 C46 210, 48 218, 52 216 C55 214, 58 195, 62 175 C66 155, 70 130, 72 108"
                             fill="url(#bodyGlow)"
                             stroke="#38bdf8"
                             strokeWidth="0.8"
-                            strokeOpacity="0.5"
+                            strokeOpacity="0.6"
                           />
-                          {/* Right Arm */}
                           <path
                             d="M132 76 C138 90, 142 115, 144 140 C146 160, 150 185, 152 205 C154 210, 152 218, 148 216 C145 214, 142 195, 138 175 C134 155, 130 130, 128 108"
                             fill="url(#bodyGlow)"
                             stroke="#38bdf8"
                             strokeWidth="0.8"
-                            strokeOpacity="0.5"
+                            strokeOpacity="0.6"
                           />
 
                           {/* Pelvis */}
-                          <path d="M78 188 C82 200, 118 200, 122 188 L116 215 L84 215 Z" fill="url(#bodyGlow)" stroke="#38bdf8" strokeWidth="0.8" strokeOpacity="0.5" />
+                          <path d="M78 188 C82 200, 118 200, 122 188 L116 215 L84 215 Z" fill="url(#bodyGlow)" stroke="#38bdf8" strokeWidth="0.8" strokeOpacity="0.6" />
 
                           {/* Legs */}
-                          {/* Left Leg */}
                           <path
                             d="M84 215 C82 235, 80 265, 82 290 C83 310, 80 335, 78 350 C80 354, 88 354, 90 350 C93 335, 94 310, 95 290 C96 265, 98 235, 98 215 Z"
                             fill="url(#bodyGlow)"
                             stroke="#38bdf8"
                             strokeWidth="0.9"
-                            strokeOpacity="0.6"
+                            strokeOpacity="0.7"
                           />
-                          {/* Right Leg */}
                           <path
                             d="M116 215 C118 235, 120 265, 118 290 C117 310, 120 335, 122 350 C120 354, 112 354, 110 350 C107 335, 106 310, 105 290 C104 265, 102 235, 102 215 Z"
                             fill="url(#bodyGlow)"
                             stroke="#38bdf8"
                             strokeWidth="0.9"
-                            strokeOpacity="0.6"
+                            strokeOpacity="0.7"
                           />
 
                           {/* Femoral Vascular tracings */}
-                          <path d="M98 185 L90 250 L88 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.4" fill="none" />
-                          <path d="M102 185 L110 250 L112 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.4" fill="none" />
+                          <path d="M98 185 L90 250 L88 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.5" fill="none" />
+                          <path d="M102 185 L110 250 L112 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.5" fill="none" />
                         </svg>
 
-                        {/* Interactive Organ Hotspots Prompt */}
-                        <div className="mt-2 text-center">
-                          <p className="text-[11px] text-slate-400">
-                            {selectedOrgan ? (
-                              <span className="text-sky-700 font-semibold">{selectedOrgan}</span>
-                            ) : (
-                              'Klik organ tubuh untuk membedah telemetri sistemik'
-                            )}
-                          </p>
+                        {/* Interactive Organ Quick Chips */}
+                        <div className="mt-3 flex flex-wrap justify-center gap-1.5 max-w-xs">
+                          <button
+                            onClick={() => setSelectedOrgan('Cardiovascular: BP 118/76 mmHg • HR 72 bpm')}
+                            className="px-2 py-0.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-800 text-[10px] font-bold border border-rose-200 transition-colors"
+                          >
+                            🫀 Jantung
+                          </button>
+                          <button
+                            onClick={() => setSelectedOrgan('Brain & Cognition: Sleep 7h 24m, Minimal Stress')}
+                            className="px-2 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-800 text-[10px] font-bold border border-purple-200 transition-colors"
+                          >
+                            🧠 Saraf
+                          </button>
+                          <button
+                            onClick={() => setSelectedOrgan('Respiratory: SpO2 98% • RR 16 x/min')}
+                            className="px-2 py-0.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-800 text-[10px] font-bold border border-sky-200 transition-colors"
+                          >
+                            🫁 Paru
+                          </button>
+                          <button
+                            onClick={() => setSelectedOrgan('Metabolism: Glucose 104 mg/dL • HbA1c 5.8%')}
+                            className="px-2 py-0.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-200 transition-colors"
+                          >
+                            🩸 Glikemik
+                          </button>
                         </div>
                       </div>
                     </div>
 
                     {/* Card 2: Health History */}
-                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
-                      <div className="text-xs font-semibold text-slate-800 mb-2">
-                        Health History
+                    <div className="rounded-2xl border border-sky-100/90 p-4 bg-white shadow-sm">
+                      <div className="flex items-center space-x-1.5 mb-2.5">
+                        <Clock className="w-3.5 h-3.5 text-indigo-600" />
+                        <span className="text-xs font-bold text-slate-900">Health History</span>
                       </div>
                       {!isOverviewGenerated && connectedRecords.length === 0 ? (
                         <p className="text-xs text-slate-400 py-3">No health history yet</p>
                       ) : (
                         <div className="space-y-2 text-xs divide-y divide-slate-100">
                           <div className="pt-1.5 space-y-0.5">
-                            <span className="font-semibold text-slate-800">Riwayat Penyakit Dahulu (RPD)</span>
-                            <p className="text-slate-500">Hipertensi Stage 1 terdiagnosis 2024. Riwayat dislipidemia terkontrol.</p>
+                            <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                              Riwayat Penyakit Dahulu (RPD)
+                            </span>
+                            <p className="text-slate-600 pl-3">Hipertensi Stage 1 terdiagnosis 2024. Riwayat dislipidemia terkontrol.</p>
                           </div>
                           <div className="pt-2 space-y-0.5">
-                            <span className="font-semibold text-slate-800">Riwayat Penyakit Keluarga (RPK)</span>
-                            <p className="text-slate-500">Ayah: Infark Miokard akut pada usia 62 th. Ibu: DM Tipe 2.</p>
+                            <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+                              Riwayat Penyakit Keluarga (RPK)
+                            </span>
+                            <p className="text-slate-600 pl-3">Ayah: Infark Miokard akut pada usia 62 th. Ibu: DM Tipe 2.</p>
                           </div>
                           <div className="pt-2 space-y-0.5">
-                            <span className="font-semibold text-slate-800">Gaya Hidup & Imunisasi</span>
-                            <p className="text-slate-500">Non-perokok, jalan kaki rata-rata 8.420 langkah/hari. Vaksin Influenza 2026.</p>
+                            <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Gaya Hidup & Imunisasi
+                            </span>
+                            <p className="text-slate-600 pl-3">Non-perokok, jalan kaki rata-rata 8.420 langkah/hari. Vaksin Influenza 2026.</p>
                           </div>
                         </div>
                       )}
@@ -1417,11 +1512,14 @@ export default function GlassAIChatPage() {
                   {/* Right Column: Connected Sources, Health Insights, Active Conditions */}
                   <div className="space-y-4 flex flex-col">
                     {/* Card 3: Connected Sources */}
-                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-slate-800">Connected Sources</span>
+                    <div className="rounded-2xl border border-sky-100/90 p-4 bg-white shadow-sm">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <div className="flex items-center space-x-1.5">
+                          <Wifi className="w-3.5 h-3.5 text-teal-600" />
+                          <span className="text-xs font-bold text-slate-900">Connected Sources</span>
+                        </div>
                         {connectedDevices.length > 0 && (
-                          <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          <span className="text-[10px] text-emerald-800 font-extrabold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                             {connectedDevices.length} Connected
                           </span>
                         )}
@@ -1432,35 +1530,42 @@ export default function GlassAIChatPage() {
                         </div>
                       ) : (
                         <div className="space-y-2 text-xs">
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-blue-50/60 border border-blue-100">
                             <div className="flex items-center space-x-2">
                               <Activity className="w-3.5 h-3.5 text-blue-600" />
-                              <span className="font-medium text-slate-800">OMRON Complete Smart BP</span>
+                              <span className="font-bold text-slate-900">OMRON Complete Smart BP</span>
                             </div>
-                            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">118/76 mmHg</span>
+                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              118/76 mmHg
+                            </span>
                           </div>
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-sky-50/60 border border-sky-100">
                             <div className="flex items-center space-x-2">
-                              <Watch className="w-3.5 h-3.5 text-slate-700" />
-                              <span className="font-medium text-slate-800">Apple Watch Ultra 2</span>
+                              <Watch className="w-3.5 h-3.5 text-sky-600" />
+                              <span className="font-bold text-slate-900">Apple Watch Ultra 2</span>
                             </div>
-                            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">72 bpm • Active</span>
+                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                              72 bpm • Active
+                            </span>
                           </div>
-                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                          <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-100">
                             <div className="flex items-center space-x-2">
                               <Database className="w-3.5 h-3.5 text-emerald-600" />
-                              <span className="font-medium text-slate-800">SatuSehat Kemenkes (IHS)</span>
+                              <span className="font-bold text-slate-900">SatuSehat Kemenkes (IHS)</span>
                             </div>
-                            <span className="text-[10px] font-mono text-slate-500">IH-10029381</span>
+                            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                              IH-10029381
+                            </span>
                           </div>
                         </div>
                       )}
                     </div>
 
                     {/* Card 4: Health Insights */}
-                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
-                      <div className="text-xs font-semibold text-slate-800 mb-2">
-                        Health Insights
+                    <div className="rounded-2xl border border-sky-100/90 p-4 bg-white shadow-sm">
+                      <div className="flex items-center space-x-1.5 mb-2.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                        <span className="text-xs font-bold text-slate-900">Health Insights</span>
                       </div>
                       {!isOverviewGenerated && connectedDevices.length === 0 ? (
                         <div className="py-4">
@@ -1468,26 +1573,30 @@ export default function GlassAIChatPage() {
                         </div>
                       ) : (
                         <div className="space-y-2.5 text-xs">
-                          <div className="p-2.5 rounded-lg bg-sky-50/60 border border-sky-100 space-y-1">
-                            <div className="flex items-center justify-between font-semibold text-sky-900">
+                          <div className="p-3 rounded-xl bg-gradient-to-r from-sky-50 to-blue-50/60 border border-sky-200/80 space-y-1">
+                            <div className="flex items-center justify-between font-bold text-sky-950">
                               <span className="flex items-center gap-1.5">
                                 <HeartPulse className="w-3.5 h-3.5 text-sky-600" />
                                 Circadian Dipping Normal
                               </span>
-                              <span className="text-[10px] text-sky-600 bg-white px-1.5 py-0.5 rounded border border-sky-200">12.4% Drop</span>
+                              <span className="text-[10px] text-sky-800 font-extrabold bg-white px-2 py-0.5 rounded-full border border-sky-200">
+                                12.4% Drop
+                              </span>
                             </div>
                             <p className="text-slate-600 text-[11px] leading-relaxed">
                               Penurunan tekanan darah malam hari berada dalam rentang fisiologis ideal (*Normal Dipper*), mengindikasikan proteksi organ target yang baik.
                             </p>
                           </div>
 
-                          <div className="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-100 space-y-1">
-                            <div className="flex items-center justify-between font-semibold text-emerald-900">
+                          <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50/60 border border-emerald-200/80 space-y-1">
+                            <div className="flex items-center justify-between font-bold text-emerald-950">
                               <span className="flex items-center gap-1.5">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                                 Adherensi Farmakoterapi Tinggi
                               </span>
-                              <span className="text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">96% Tercatat</span>
+                              <span className="text-[10px] text-emerald-800 font-extrabold bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                                96% Tercatat
+                              </span>
                             </div>
                             <p className="text-slate-600 text-[11px] leading-relaxed">
                               Kepatuhan konsumsi Amlodipine 5mg tepat waktu teratur selama 30 hari berturut-turut via asisten Pillo.
@@ -1498,9 +1607,10 @@ export default function GlassAIChatPage() {
                     </div>
 
                     {/* Card 5: Active Conditions, Medications, & Allergies */}
-                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
-                      <div className="text-xs font-semibold text-slate-800 mb-2">
-                        Active Conditions, Medications, & Allergies
+                    <div className="rounded-2xl border border-sky-100/90 p-4 bg-white shadow-sm">
+                      <div className="flex items-center space-x-1.5 mb-2.5">
+                        <Shield className="w-3.5 h-3.5 text-rose-500" />
+                        <span className="text-xs font-bold text-slate-900">Active Conditions, Medications, & Allergies</span>
                       </div>
                       {!isOverviewGenerated && connectedRecords.length === 0 ? (
                         <div className="py-4">
@@ -1509,35 +1619,46 @@ export default function GlassAIChatPage() {
                       ) : (
                         <div className="space-y-3 text-xs">
                           <div>
-                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Kondisi Aktif</span>
+                            <span className="text-slate-500 block text-[10px] uppercase font-bold tracking-wider mb-1.5">
+                              Kondisi Aktif
+                            </span>
                             <div className="flex flex-wrap gap-1.5">
-                              <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                              <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-bold">
                                 Hipertensi Esensial (ICD-10 I10)
                               </span>
-                              <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+                              <span className="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-900 border border-indigo-200 font-bold">
                                 Prediabetes (ICD-10 R73.03)
                               </span>
                             </div>
                           </div>
 
                           <div>
-                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Medikasi Berjalan</span>
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-slate-700">
-                                <span className="font-semibold text-slate-800">Amlodipine Besylate 5 mg</span>
-                                <span className="text-slate-500">1x1 Pagi</span>
+                            <span className="text-slate-500 block text-[10px] uppercase font-bold tracking-wider mb-1.5">
+                              Medikasi Berjalan
+                            </span>
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                                <span className="font-bold text-slate-900">Amlodipine Besylate 5 mg</span>
+                                <span className="text-sky-700 font-semibold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 text-[10px]">
+                                  1x1 Pagi
+                                </span>
                               </div>
-                              <div className="flex items-center justify-between text-slate-700">
-                                <span className="font-semibold text-slate-800">Metformin HCl 500 mg</span>
-                                <span className="text-slate-500">2x1 Bersama Makan</span>
+                              <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                                <span className="font-bold text-slate-900">Metformin HCl 500 mg</span>
+                                <span className="text-sky-700 font-semibold bg-sky-50 px-2 py-0.5 rounded border border-sky-200 text-[10px]">
+                                  2x1 Bersama Makan
+                                </span>
                               </div>
                             </div>
                           </div>
 
                           <div>
-                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Alergi Terverifikasi</span>
-                            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 font-semibold inline-block">
-                              Penisilin (Reaksi: Urtikaria / Ruam Akut)
+                            <span className="text-slate-500 block text-[10px] uppercase font-bold tracking-wider mb-1.5">
+                              Alergi Terverifikasi
+                            </span>
+                            <span className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 font-bold inline-flex items-center gap-1.5">
+                              <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                              <span>Penisilin (Reaksi: Urtikaria / Ruam Akut)</span>
                             </span>
                           </div>
                         </div>
@@ -1554,11 +1675,13 @@ export default function GlassAIChatPage() {
       {/* MODAL 1: Connect a Device */}
       {isDeviceModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-sky-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-sky-50 to-white">
               <div className="flex items-center space-x-2">
-                <Watch className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-slate-900">Hubungkan Perangkat Medis</h3>
+                <div className="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700 font-bold">
+                  <Watch className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-slate-900">Hubungkan Perangkat Medis</h3>
               </div>
               <button
                 onClick={() => setIsDeviceModalOpen(false)}
@@ -1569,22 +1692,22 @@ export default function GlassAIChatPage() {
             </div>
 
             <div className="p-5 space-y-3">
-              <p className="text-xs text-slate-500 mb-2">
+              <p className="text-xs text-slate-600 mb-2 font-medium">
                 Pilih perangkat medis atau wearable yang ingin Anda sinkronkan dengan Sehat AI Encounter:
               </p>
 
               {/* OMRON Blood Pressure */}
               <div
                 onClick={() => handleConnectDevice('omron')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-sky-200/90 bg-white hover:border-blue-500 hover:bg-blue-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-blue-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700">
                     OMRON Complete™ Smart BP + EKG
                   </div>
                   <div className="text-xs text-slate-500">Bluetooth Low Energy • LOINC 85354-9</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                   Hubungkan
                 </span>
               </div>
@@ -1592,15 +1715,15 @@ export default function GlassAIChatPage() {
               {/* Apple Watch HealthKit */}
               <div
                 onClick={() => handleConnectDevice('apple')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-sky-200/90 bg-white hover:border-blue-500 hover:bg-blue-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-blue-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700">
                     Apple Watch Ultra (HealthKit)
                   </div>
                   <div className="text-xs text-slate-500">Continuous Heart Rate, HRV & Sleep Telemetry</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                   Hubungkan
                 </span>
               </div>
@@ -1608,15 +1731,15 @@ export default function GlassAIChatPage() {
               {/* Dexcom G7 CGM */}
               <div
                 onClick={() => handleConnectDevice('dexcom')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-sky-200/90 bg-white hover:border-blue-500 hover:bg-blue-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-blue-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-blue-700">
                     Dexcom G7 Continuous Glucose Monitor
                   </div>
                   <div className="text-xs text-slate-500">Real-time Interstitial Glucose (TIR 98%)</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
                   Hubungkan
                 </span>
               </div>
@@ -1624,15 +1747,15 @@ export default function GlassAIChatPage() {
               {/* Aolon GT6 Pro / Google Health Connect */}
               <div
                 onClick={() => handleConnectDevice('aolon')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-teal-200/90 bg-white hover:border-teal-500 hover:bg-teal-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-emerald-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-teal-700">
                     Aolon GT6 Pro (Google Health Connect)
                   </div>
                   <div className="text-xs text-slate-500">Android Health Connect • 24/7 PPG Nadi, SpO2 & Langkah</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-teal-50 text-teal-700 group-hover:bg-teal-600 group-hover:text-white transition-all shadow-2xs">
                   Hubungkan
                 </span>
               </div>
@@ -1641,7 +1764,7 @@ export default function GlassAIChatPage() {
             <div className="p-4 bg-slate-50 border-t border-slate-100 text-right">
               <button
                 onClick={() => setIsDeviceModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800"
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800"
               >
                 Tutup
               </button>
@@ -1653,11 +1776,13 @@ export default function GlassAIChatPage() {
       {/* MODAL 2: Connect Health Records */}
       {isRecordModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-emerald-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-white">
               <div className="flex items-center space-x-2">
-                <Database className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-slate-900">Hubungkan Rekam Medis (EMR/FHIR)</h3>
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
+                  <Database className="w-4 h-4" />
+                </div>
+                <h3 className="font-extrabold text-slate-900">Hubungkan Rekam Medis (EMR/FHIR)</h3>
               </div>
               <button
                 onClick={() => setIsRecordModalOpen(false)}
@@ -1668,22 +1793,22 @@ export default function GlassAIChatPage() {
             </div>
 
             <div className="p-5 space-y-3">
-              <p className="text-xs text-slate-500 mb-2">
+              <p className="text-xs text-slate-600 mb-2 font-medium">
                 Sinkronkan rekam medis elektronik Anda via portal resmi berstandar HL7 FHIR R4:
               </p>
 
               {/* SatuSehat Kemenkes RI */}
               <div
                 onClick={() => handleConnectRecord('SatuSehat Kemenkes RI')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-emerald-200/90 bg-white hover:border-emerald-500 hover:bg-emerald-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-emerald-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-emerald-700">
                     SatuSehat Kemenkes RI
                   </div>
                   <div className="text-xs text-slate-500">Platform Integrasi Kesehatan Nasional (UU PDP)</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
                   Sync FHIR
                 </span>
               </div>
@@ -1691,15 +1816,15 @@ export default function GlassAIChatPage() {
               {/* RSUPN Dr. Cipto Mangunkusumo */}
               <div
                 onClick={() => handleConnectRecord('RSUPN Dr. Cipto Mangunkusumo')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-emerald-200/90 bg-white hover:border-emerald-500 hover:bg-emerald-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-emerald-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-emerald-700">
                     RSUPN Dr. Cipto Mangunkusumo
                   </div>
                   <div className="text-xs text-slate-500">Pusat Rujukan Nasional • Resume Medis & Lab</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
                   Sync FHIR
                 </span>
               </div>
@@ -1707,15 +1832,15 @@ export default function GlassAIChatPage() {
               {/* RS Jantung Harapan Kita */}
               <div
                 onClick={() => handleConnectRecord('RS Jantung & Pembuluh Darah Harapan Kita')}
-                className="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all flex items-center justify-between group"
+                className="p-3.5 rounded-2xl border border-emerald-200/90 bg-white hover:border-emerald-500 hover:bg-emerald-50/60 cursor-pointer transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-900 text-sm group-hover:text-emerald-700">
+                  <div className="font-bold text-slate-900 text-sm group-hover:text-emerald-700">
                     RS Jantung Harapan Kita
                   </div>
                   <div className="text-xs text-slate-500">Pusat Jantung Nasional • Telemetri & Echo</div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-2xs">
                   Sync FHIR
                 </span>
               </div>
@@ -1724,7 +1849,7 @@ export default function GlassAIChatPage() {
             <div className="p-4 bg-slate-50 border-t border-slate-100 text-right">
               <button
                 onClick={() => setIsRecordModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800"
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800"
               >
                 Tutup
               </button>
