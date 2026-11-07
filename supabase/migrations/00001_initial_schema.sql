@@ -379,17 +379,59 @@ CREATE INDEX idx_research_enrollments_proj ON research_enrollments(project_id);
 -- ============================================================================
 -- 6. AUTOMATIC AUTH USER -> PROFILE CREATION TRIGGER
 -- ============================================================================
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth, pg_temp
+AS $$
 DECLARE
-    user_role_val user_role;
+    user_role_val public.user_role := 'patient'::public.user_role;
+    gender_val public.gender_type := 'unknown'::public.gender_type;
     given_name_val TEXT;
     family_name_val TEXT;
+    dob_val DATE := NULL;
+    raw_role TEXT;
+    raw_gender TEXT;
 BEGIN
-    user_role_val := COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'patient'::user_role);
-    given_name_val := COALESCE(NEW.raw_user_meta_data->>'given_name', '');
-    family_name_val := COALESCE(NEW.raw_user_meta_data->>'family_name', '');
+    -- Extract given and family names supporting multiple naming conventions
+    given_name_val := COALESCE(
+        NEW.raw_user_meta_data->>'given_name',
+        NEW.raw_user_meta_data->>'givenName',
+        NEW.raw_user_meta_data->>'firstName',
+        NEW.raw_user_meta_data->>'first_name',
+        ''
+    );
+    family_name_val := COALESCE(
+        NEW.raw_user_meta_data->>'family_name',
+        NEW.raw_user_meta_data->>'familyName',
+        NEW.raw_user_meta_data->>'lastName',
+        NEW.raw_user_meta_data->>'last_name',
+        ''
+    );
 
+    -- Safe role parsing
+    raw_role := LOWER(COALESCE(NEW.raw_user_meta_data->>'role', 'patient'));
+    IF raw_role IN ('patient', 'doctor', 'researcher', 'admin') THEN
+        user_role_val := raw_role::public.user_role;
+    END IF;
+
+    -- Safe gender parsing
+    raw_gender := LOWER(COALESCE(NEW.raw_user_meta_data->>'gender', 'unknown'));
+    IF raw_gender IN ('male', 'female', 'other', 'unknown') THEN
+        gender_val := raw_gender::public.gender_type;
+    END IF;
+
+    -- Safe date of birth parsing
+    IF NEW.raw_user_meta_data->>'date_of_birth' IS NOT NULL AND NEW.raw_user_meta_data->>'date_of_birth' ~ '^\d{4}-\d{2}-\d{2}$' THEN
+        BEGIN
+            dob_val := (NEW.raw_user_meta_data->>'date_of_birth')::DATE;
+        EXCEPTION WHEN OTHERS THEN
+            dob_val := NULL;
+        END;
+    END IF;
+
+    -- Insert into profiles
     INSERT INTO public.profiles (
         id,
         email,
@@ -400,27 +442,32 @@ BEGIN
         phone_number
     ) VALUES (
         NEW.id,
-        NEW.email,
+        COALESCE(NEW.email, ''),
         user_role_val,
         jsonb_build_object('givenName', given_name_val, 'familyName', family_name_val),
-        COALESCE((NEW.raw_user_meta_data->>'gender')::gender_type, 'unknown'::gender_type),
-        CASE
-            WHEN NEW.raw_user_meta_data->>'date_of_birth' IS NOT NULL AND NEW.raw_user_meta_data->>'date_of_birth' ~ '^\d{4}-\d{2}-\d{2}$'
-            THEN (NEW.raw_user_meta_data->>'date_of_birth')::DATE
-            ELSE NULL
-        END,
+        gender_val,
+        dob_val,
         NEW.raw_user_meta_data->>'phone_number'
-    );
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        email = EXCLUDED.email,
+        name_components = CASE WHEN EXCLUDED.name_components <> '{"familyName": "", "givenName": ""}'::jsonb THEN EXCLUDED.name_components ELSE public.profiles.name_components END,
+        updated_at = NOW();
 
     RETURN NEW;
+EXCEPTION
+    WHEN OTHERS THEN
+        -- Fallback: Ensure auth.users NEVER fails even if profile creation hits an edge case
+        RAISE WARNING 'handle_new_user error: %', SQLERRM;
+        RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Trigger attached to auth.users table
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- ============================================================================
 -- 7. ROW LEVEL SECURITY (RLS) POLICIES
