@@ -11,6 +11,7 @@ import {
   Switch,
   Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -47,136 +48,7 @@ export interface DiscoveredDevice {
   clearance: string;
 }
 
-const INITIAL_DEVICES: MedicalDevice[] = [
-  // 1. Wearables 24/7 Continuous
-  {
-    id: 'dev-apple-watch-9',
-    name: 'Apple Watch Series 9',
-    model: 'Series 9 (45mm)',
-    category: 'wearable',
-    type: 'smartwatch',
-    battery: 88,
-    lastSeen: 'Live Telemetry (3m lalu)',
-    connected: true,
-    regulatoryClearance: 'US FDA Cleared (Class II) • Kemenkes RI AKL',
-    signalQuality: 98,
-    firmwareVersion: 'watchOS 11.2 (Latest)',
-    activeSensors: [
-      '❤️ 24/7 PPG Pulse & HRV',
-      '⚡ Single-Lead ECG (Sinus Rhythm)',
-      '💨 SpO2 Nocturnal Oximetry (98%)',
-      '🌡️ Sensor Suhu Kulit Sirkadian',
-      '🚨 Hard Fall Detection (Deteksi Jatuh Medis)',
-      '💓 AFib Burden Monitoring (0% Normal)',
-    ],
-    metricsSummary: '72 BPM Nadi • 98% SpO2 • Suhu 36.5°C',
-    fallDetectionActive: true,
-    afibMonitoringActive: true,
-  },
-  {
-    id: 'dev-dexcom-g7',
-    name: 'Dexcom G7 CGM Patch',
-    model: 'Dexcom G7 Continuous',
-    category: 'wearable',
-    type: 'glucose',
-    battery: 92,
-    lastSeen: 'Live CGM (5m lalu)',
-    connected: true,
-    regulatoryClearance: 'US FDA Cleared Class II CGM • Kemenkes AKL',
-    signalQuality: 96,
-    firmwareVersion: 'v1.4.2 Sensor',
-    sensorExpiry: '13 Nov 2026 (Sisa 6 Hari)',
-    activeSensors: [
-      '🩸 Subcutaneous Interstitial Glucose',
-      '📈 Real-time Trend Velocity Arrow',
-      '⚠️ Urgent Low Glucose Predictive Alert',
-    ],
-    metricsSummary: '98 mg/dL (Glikemia Terkontrol Puasa)',
-  },
-  {
-    id: 'dev-wellue-ring',
-    name: 'Wellue O2Ring Continuous Oximeter',
-    model: 'O2Ring Medical',
-    category: 'wearable',
-    type: 'oximeter',
-    battery: 94,
-    lastSeen: 'Siaga Tidur (Malam)',
-    connected: true,
-    regulatoryClearance: 'CE Medical Class IIa • Kemenkes AKL',
-    signalQuality: 95,
-    firmwareVersion: 'v2.1.0',
-    activeSensors: [
-      '💨 Continuous SpO2 Nocturnal Logging',
-      '📳 Haptic Vibration on O2 Desaturation (<92%)',
-      '📊 ODI (Oxygen Desaturation Index)',
-    ],
-    metricsSummary: 'ODI < 5/jam (Normal, Bebas Sleep Apnea)',
-  },
-
-  // 2. Point of Care Diagnostics
-  {
-    id: 'dev-bp-5250',
-    name: 'Omron BP5250 Upper Arm Cuff',
-    model: 'BP5250 Bluetooth',
-    category: 'point_of_care',
-    type: 'blood_pressure',
-    battery: 100,
-    lastSeen: 'Hari Ini, 14:36 WIB',
-    connected: true,
-    regulatoryClearance: 'ESH-IP & BIHS Validated • Kemenkes AKL 20501',
-    signalQuality: 100,
-    firmwareVersion: 'v3.2.0',
-    calibrationDue: 'Oktober 2027 (Valid)',
-    activeSensors: [
-      '🩺 Dual Oscillometric Pressure Transducer',
-      '✅ Cuff Wrap Guide (Manset Pas)',
-      '🚫 Motion Detection Artifact Filter',
-      '💓 Irregular Heartbeat Indicator',
-    ],
-    metricsSummary: '103/64 mmHg • 62 BPM (Optimal AHA 2017)',
-  },
-  {
-    id: 'dev-sc-150',
-    name: 'Spezi SC-150 Composition Scale',
-    model: 'SC-150 Smart BIA',
-    category: 'point_of_care',
-    type: 'scale',
-    battery: 92,
-    lastSeen: 'Hari Ini, 07:15 WIB',
-    connected: true,
-    regulatoryClearance: 'Medical Grade Multi-Freq BIA',
-    signalQuality: 94,
-    firmwareVersion: 'v1.1.8',
-    calibrationDue: 'Desember 2027',
-    activeSensors: [
-      '⚖️ 8-Electrode Bioelectrical Impedance',
-      '💧 Total Body Water (Deteksi Retensi Cairan Jantung)',
-      '🥩 Skeletal Muscle Mass',
-    ],
-    metricsSummary: '68.4 kg • Air Tubuh 58% (Normal Euvolemik)',
-  },
-
-  // 3. Neuro-Telemetry
-  {
-    id: 'dev-muse-s',
-    name: 'Stanford NAMS Muse S Headband',
-    model: 'Muse S 4-Channel',
-    category: 'neuro',
-    type: 'eeg',
-    battery: 85,
-    lastSeen: 'Kemarin, 20:00 WIB',
-    connected: true,
-    regulatoryClearance: 'Stanford BDHG Research & Clinical Telemetry',
-    signalQuality: 99,
-    firmwareVersion: 'v4.0.2',
-    activeSensors: [
-      '🧠 4-Channel Frontal EEG (TP9, AF7, AF8, TP10)',
-      '⚡ TBR (Theta/Beta Ratio) Cognitive Index',
-      '😴 Sleep Architecture & Delta Slow-Wave',
-    ],
-    metricsSummary: 'TBR 2.14 • Impedansi Kontak 100% Sempurna',
-  },
-];
+const INITIAL_DEVICES: MedicalDevice[] = [];
 
 const SCAN_CATALOG: DiscoveredDevice[] = [
   {
@@ -239,6 +111,27 @@ export default function DevicesScreen() {
   const [selectedDevice, setSelectedDevice] = useState<MedicalDevice | null>(null);
   const [activeTabFilter, setActiveTabFilter] = useState<'all' | 'wearable' | 'point_of_care' | 'neuro'>('all');
 
+  // Load real connected devices from storage on mount
+  useEffect(() => {
+    AsyncStorage.getItem('@connected_medical_devices')
+      .then((val) => {
+        if (val) {
+          try {
+            const parsed = JSON.parse(val);
+            if (Array.isArray(parsed)) {
+              setDevices(parsed);
+            }
+          } catch {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const updateDevices = (newDevs: MedicalDevice[]) => {
+    setDevices(newDevs);
+    AsyncStorage.setItem('@connected_medical_devices', JSON.stringify(newDevs)).catch(() => {});
+  };
+
   // Scanner modal states
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -252,15 +145,23 @@ export default function DevicesScreen() {
 
   // Sync All Telemetry Action
   const handleSyncAll = () => {
+    if (devices.length === 0) {
+      Alert.alert(
+        'Belum Ada Perangkat',
+        'Silakan hubungkan smartwatch Aolon GT6 Pro atau perangkat medis lainnya terlebih dahulu untuk melakukan sinkronisasi telemetri.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
     Alert.alert(
       '📡 Sinkronisasi Semua Telemetri',
-      'Mengambil data sensor terkini dari Apple Watch (PPG/ECG), Omron BP5250, Dexcom CGM, dan Timbangan Spezi ke rekam medis Supabase & DPJP.',
+      `Mengambil data sensor terkini dari ${devices.length} perangkat yang terhubung ke rekam medis Supabase & DPJP.`,
       [
         { text: 'Batal', style: 'cancel' },
         {
           text: 'Mulai Sinkronisasi',
           onPress: () => {
-            setToastMessage('✅ 6 Perangkat Berhasil Disinkronkan ke HL7 FHIR');
+            setToastMessage(`✅ ${devices.length} Perangkat Berhasil Disinkronkan ke HL7 FHIR`);
             setTimeout(() => setToastMessage(null), 4000);
           },
         },
@@ -323,7 +224,7 @@ export default function DevicesScreen() {
         metricsSummary: metricsSummary,
       };
 
-      setDevices((prev) => [...prev, newDevice]);
+      updateDevices([...devices, newDevice]);
       setIsPairing(false);
       setPairingCandidate(null);
       setShowScannerModal(false);
@@ -344,7 +245,7 @@ export default function DevicesScreen() {
           text: 'Putuskan Sambungan',
           style: 'destructive',
           onPress: () => {
-            setDevices((prev) => prev.filter((d) => d.id !== deviceId));
+            updateDevices(devices.filter((d) => d.id !== deviceId));
             setSelectedDevice(null);
             setToastMessage('Perangkat telah diputuskan.');
             setTimeout(() => setToastMessage(null), 3000);
@@ -409,12 +310,31 @@ export default function DevicesScreen() {
             <View style={styles.heroTitleWrap}>
               <Text style={styles.heroSub}>HUB TELEMETRI KLINIS 24/7</Text>
               <Text style={[styles.heroTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-                {devices.filter((d) => d.connected).length} Perangkat Aktif Siaga
+                {devices.filter((d) => d.connected).length === 0
+                  ? '0 Perangkat Terhubung'
+                  : `${devices.filter((d) => d.connected).length} Perangkat Aktif Siaga`}
               </Text>
             </View>
-            <View style={styles.liveStreamBadge}>
-              <View style={styles.liveStreamDot} />
-              <Text style={styles.liveStreamText}>Live RPM</Text>
+            <View
+              style={[
+                styles.liveStreamBadge,
+                devices.length === 0 && { backgroundColor: isDark ? '#2C2C2E' : '#E5E5EA' },
+              ]}
+            >
+              <View
+                style={[
+                  styles.liveStreamDot,
+                  devices.length === 0 && { backgroundColor: '#8E8E93' },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.liveStreamText,
+                  devices.length === 0 && { color: '#8E8E93' },
+                ]}
+              >
+                {devices.length === 0 ? 'Siaga' : 'Live RPM'}
+              </Text>
             </View>
           </View>
 
@@ -502,7 +422,29 @@ export default function DevicesScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.devicesList}>
+        {filteredDevices.length === 0 ? (
+          <View style={[styles.emptyCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
+            <View style={styles.emptyIconCircle}>
+              <Ionicons name="hardware-chip-outline" size={38} color="#007AFF" />
+            </View>
+            <Text style={[styles.emptyTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+              Belum Ada Perangkat Terhubung
+            </Text>
+            <Text style={styles.emptySubtitle}>
+              Hubungkan Smartwatch Aolon GT6 Pro (Google Health Connect) atau alat medis Bluetooth (Omron, Beurer, Accu-Chek) untuk pemantauan telemetri real-time.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.emptyActionBtn}
+              onPress={startScan}
+              activeOpacity={0.85}
+            >
+              <Ionicons name="bluetooth" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
+              <Text style={styles.emptyActionBtnText}>+ Hubungkan Perangkat (BLE / Health Connect)</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.devicesList}>
           {filteredDevices.map((device) => {
             const isWatch = device.type === 'smartwatch';
             const isBP = device.type === 'blood_pressure';
@@ -628,6 +570,7 @@ export default function DevicesScreen() {
             );
           })}
         </View>
+        )}
 
         {/* ================= 4. MEDICAL ARTIFACT FILTER TOGGLE ================= */}
         <View style={[styles.settingsCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
@@ -1650,6 +1593,54 @@ const styles = StyleSheet.create({
   confirmPairBtnText: {
     color: '#FFFFFF',
     fontSize: 15,
+    fontWeight: '700',
+  },
+
+  // Empty State Styles
+  emptyCard: {
+    borderRadius: 20,
+    padding: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 12,
+    borderWidth: 1,
+    borderColor: '#8E8E9320',
+  },
+  emptyIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#007AFF12',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: '#8E8E93',
+    textAlign: 'center',
+    lineHeight: 19,
+    marginBottom: 20,
+    maxWidth: 300,
+  },
+  emptyActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007AFF',
+    paddingVertical: 13,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+  },
+  emptyActionBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
     fontWeight: '700',
   },
 });
