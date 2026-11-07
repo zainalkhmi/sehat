@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { STANDARD_LOINC_CODES, UCUM_UNITS } from '@future-health/fhir';
+import { SupabaseBadge } from '../../../../components/SupabaseBadge';
+import { fetchLiveObservations, insertLiveObservation } from '../../../../lib/supabase-service';
 
 interface VitalEntry {
   id: string;
@@ -75,6 +77,20 @@ const INITIAL_VITALS: VitalEntry[] = [
 export default function PatientObservationsPage() {
   const [vitals, setVitals] = useState<VitalEntry[]>(INITIAL_VITALS);
   const [selectedType, setSelectedType] = useState<'bp' | 'hr' | 'spo2' | 'glucose' | 'temp'>('bp');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchLiveObservations().then((data) => {
+      if (isMounted) {
+        if (data && data.length > 0) {
+          setVitals(data as any);
+        }
+        setLoading(false);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   // Form states
   const [systolic, setSystolic] = useState('');
@@ -82,7 +98,7 @@ export default function PatientObservationsPage() {
   const [numericValue, setNumericValue] = useState('');
   const [logSuccess, setLogSuccess] = useState(false);
 
-  const handleLogVital = (e: React.FormEvent) => {
+  const handleLogVital = async (e: React.FormEvent) => {
     e.preventDefault();
 
     let newEntry: VitalEntry;
@@ -150,6 +166,18 @@ export default function PatientObservationsPage() {
       setNumericValue('');
     }
 
+    // Persist to Supabase if live
+    insertLiveObservation({
+      patientId: 'FH-PT-1002',
+      loincCode: newEntry.loincCode,
+      name: newEntry.name,
+      valueNumeric: newEntry.valueNumeric,
+      unit: newEntry.unit,
+      effectiveDateTime: newEntry.effectiveDateTime,
+      source: newEntry.source,
+      components: newEntry.components,
+    }).catch(console.warn);
+
     setVitals([newEntry, ...vitals]);
     setLogSuccess(true);
     setTimeout(() => setLogSuccess(false), 3000);
@@ -174,6 +202,7 @@ export default function PatientObservationsPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <SupabaseBadge />
           <Link
             href="/dashboard/patient/profile"
             className="px-3 py-1.5 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 text-slate-700"

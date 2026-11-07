@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { SupabaseBadge } from '../../../components/SupabaseBadge';
 import {
   Microscope,
   Database,
@@ -437,6 +438,7 @@ export default function ResearcherDashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+            <SupabaseBadge />
             <div className="text-right hidden sm:block">
               <div className="text-sm font-semibold text-white">Prof. Bambang Hidayat, Ph.D.</div>
               <div className="text-xs text-emerald-300">Principal Investigator • UI / RSCM</div>

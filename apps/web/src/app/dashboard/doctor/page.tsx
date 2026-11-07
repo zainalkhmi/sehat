@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { SupabaseBadge } from '../../../components/SupabaseBadge';
+import { fetchLivePatients, DEFAULT_PATIENTS } from '../../../lib/supabase-service';
 import {
   Stethoscope,
   Users,
@@ -22,42 +24,22 @@ import {
 export default function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<string>('FH-PT-1002');
   const [reviewStatus, setReviewStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
+  const [patients, setPatients] = useState<any[]>(DEFAULT_PATIENTS);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const patients = [
-    {
-      id: 'FH-PT-1002',
-      name: 'Ahmad Kusuma',
-      age: 38,
-      gender: 'Male',
-      condition: 'Hypertension Stage 1 (Screening)',
-      riskLevel: 'moderate',
-      lastVitals: '118/76 mmHg • 72 bpm',
-      lastSeen: '2 hours ago',
-      assignedStatus: 'active',
-    },
-    {
-      id: 'FH-PT-1003',
-      name: 'Siti Rahmawati',
-      age: 52,
-      gender: 'Female',
-      condition: 'Type 2 Diabetes Screening',
-      riskLevel: 'high',
-      lastVitals: '142/88 mmHg • 86 bpm • Glucose 168 mg/dL',
-      lastSeen: 'Yesterday',
-      assignedStatus: 'active',
-    },
-    {
-      id: 'FH-PT-1005',
-      name: 'Budi Santoso',
-      age: 29,
-      gender: 'Male',
-      condition: 'Post-viral Fatigue & Anxiety',
-      riskLevel: 'low',
-      lastVitals: '112/70 mmHg • 68 bpm',
-      lastSeen: '3 days ago',
-      assignedStatus: 'active',
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    fetchLivePatients().then((data) => {
+      if (isMounted) {
+        setPatients(data);
+        if (data.length > 0 && !data.some(p => p.id === selectedPatient)) {
+          setSelectedPatient(data[0].id);
+        }
+        setIsLoading(false);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -81,6 +63,7 @@ export default function DoctorDashboard() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+            <SupabaseBadge />
             <Link
               href="/dashboard/doctor/risk-assessments"
               className="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3 py-1.5 rounded-lg shadow-sm transition flex items-center"

@@ -1,7 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { SupabaseBadge } from '../../../../components/SupabaseBadge';
+import { fetchLivePatients, DEFAULT_PATIENTS } from '../../../../lib/supabase-service';
 import {
   Users,
   Search,
@@ -25,53 +27,19 @@ export default function DoctorPatientsManagementPage() {
   const [newPatientMRN, setNewPatientMRN] = useState('');
   const [assignmentNotice, setAssignmentNotice] = useState(false);
 
-  const assignedPatients = [
-    {
-      id: 'FH-PT-1002',
-      name: 'Ahmad Kusuma',
-      age: 38,
-      gender: 'Male',
-      assignedType: 'Primary Care Clinician',
-      assignedDate: '14 Oct 2026',
-      consentStatus: 'Active Consent',
-      primaryCondition: 'Hypertension Stage 1 (Screening)',
-      riskLevel: 'moderate',
-      latestBP: '118/76 mmHg',
-      latestHR: '72 bpm',
-      phq9Score: 8,
-      lastTelemetry: 'Today, 08:30 WIB',
-    },
-    {
-      id: 'FH-PT-1003',
-      name: 'Siti Rahmawati',
-      age: 52,
-      gender: 'Female',
-      assignedType: 'Cardiology Specialist',
-      assignedDate: '28 Sep 2026',
-      consentStatus: 'Active Consent',
-      primaryCondition: 'Type 2 Diabetes & Angina Pectoris',
-      riskLevel: 'high',
-      latestBP: '142/88 mmHg',
-      latestHR: '86 bpm',
-      phq9Score: 12,
-      lastTelemetry: 'Yesterday, 14:10 WIB',
-    },
-    {
-      id: 'FH-PT-1005',
-      name: 'Budi Santoso',
-      age: 29,
-      gender: 'Male',
-      assignedType: 'Consultant',
-      assignedDate: '02 Nov 2026',
-      consentStatus: 'Active Consent',
-      primaryCondition: 'Post-viral Fatigue & Mild Anxiety',
-      riskLevel: 'low',
-      latestBP: '112/70 mmHg',
-      latestHR: '68 bpm',
-      phq9Score: 3,
-      lastTelemetry: '3 days ago',
-    },
-  ];
+  const [assignedPatients, setAssignedPatients] = useState<any[]>(DEFAULT_PATIENTS);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchLivePatients().then((data) => {
+      if (isMounted) {
+        setAssignedPatients(data);
+        setLoading(false);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAssignPatient = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,13 +74,16 @@ export default function DoctorPatientsManagementPage() {
               </span>
             </div>
           </div>
-          <button
-            onClick={() => setShowAssignModal(true)}
-            className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold shadow flex items-center space-x-1.5"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Assign New Patient</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <SupabaseBadge />
+            <button
+              onClick={() => setShowAssignModal(true)}
+              className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold shadow flex items-center space-x-1.5"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Assign New Patient</span>
+            </button>
+          </div>
         </div>
       </header>
 

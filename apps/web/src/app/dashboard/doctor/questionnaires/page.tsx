@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { scorePHQ9, scoreGAD7 } from '@future-health/domain';
+import { SupabaseBadge } from '../../../../components/SupabaseBadge';
 
 interface ClinicalSubmission {
   id: string;
@@ -159,6 +160,7 @@ export default function DoctorQuestionnairesPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <SupabaseBadge />
           <Link
             href="/dashboard/doctor/risk-assessments"
             className="px-3 py-1.5 text-xs font-semibold bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 text-indigo-700 flex items-center gap-1"

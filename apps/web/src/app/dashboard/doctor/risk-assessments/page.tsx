@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { SupabaseBadge } from '../../../../components/SupabaseBadge';
+import { updateLiveRiskAssessment } from '../../../../lib/supabase-service';
 import {
   Brain,
   AlertTriangle,
@@ -183,8 +185,14 @@ export default function DoctorRiskAssessmentsPage() {
     setIsSubmitting(true);
     setStatusMessage(null);
 
-    // Simulate API call to AI Engine / Supabase review-assessment endpoint
-    await new Promise((r) => setTimeout(r, 600));
+    // Call Supabase live update if configured
+    updateLiveRiskAssessment(selectedAssessment.id, {
+      reviewStatus: reviewAction,
+      reviewedByClinicianId: 'dr-sarah-wijaya',
+      clinicianNotes: clinicianNotes.trim() || 'Clinician verified and signed without amendments.',
+    }).catch(console.warn);
+
+    await new Promise((r) => setTimeout(r, 400));
 
     const finalLevel = reviewAction === 'modified' ? overrideLevel : selectedAssessment.riskLevel;
 
@@ -261,6 +269,7 @@ export default function DoctorRiskAssessmentsPage() {
             </div>
           </div>
           <div className="flex items-center space-x-3">
+            <SupabaseBadge />
             <Link
               href="/dashboard/doctor/questionnaires"
               className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium px-3 py-1.5 rounded-lg transition"
