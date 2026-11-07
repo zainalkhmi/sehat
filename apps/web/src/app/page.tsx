@@ -77,13 +77,6 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/dashboard/mens-health"
-              className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-medium shadow-md shadow-teal-700/20 transition-all hover:-translate-y-0.5"
-            >
-              <span>Men's Health (صحة الرجل)</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
               href="/sdk"
               className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md shadow-indigo-600/20 transition-all hover:-translate-y-0.5"
             >

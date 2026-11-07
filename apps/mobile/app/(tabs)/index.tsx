@@ -61,16 +61,6 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/(tabs)/measurements',
   },
   {
-    id: 'mens_health',
-    title: "Men's Health (صحة الرجل)",
-    subtitle: 'Preconception, andrology & Malaffi',
-    icon: 'shield-checkmark',
-    color: '#007AFF',
-    bgColor: '#007AFF15',
-    badge: 'Abu Dhabi DoH',
-    route: '/mens-health',
-  },
-  {
     id: 'nams',
     title: 'NAMS NeuroNest',
     subtitle: 'Stanford 4-channel EEG & cognition',
