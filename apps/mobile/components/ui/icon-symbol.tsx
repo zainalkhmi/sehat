@@ -17,6 +17,9 @@ const MAPPING = {
   'calendar': 'event',
   'person.2.fill': 'people',
   'paperplane.fill': 'send',
+  'sensor': 'devices-other',
+  'waveform.path.ecg': 'monitor-heart',
+  'list.clipboard.fill': 'assignment',
 
   // UI Elements
   'chevron.left.forwardslash.chevron.right': 'code',

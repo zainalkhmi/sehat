@@ -78,12 +78,26 @@ export default function TabLayout() {
         }}
       />
         <Tabs.Screen
-        name="health"
-        options={{
-          title: 'Health',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
-        }}
-      />
+          name="devices"
+          options={{
+            title: 'Devices',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="sensor" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="measurements"
+          options={{
+            title: 'Measurements',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="waveform.path.ecg" color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="health"
+          options={{
+            title: 'Health',
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="heart.fill" color={color} />,
+          }}
+        />
       </Tabs>
 
       <AccountSheet
