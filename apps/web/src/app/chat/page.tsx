@@ -205,6 +205,20 @@ export default function GlassAIChatPage() {
           statusBadge: 'In-Range (TIR 98%)'
         };
         setConnectedDevices((prev) => [...prev.filter((d) => d.id !== newDevice.id), newDevice]);
+      } else if (type === 'aolon') {
+        const newDevice: ConnectedDevice = {
+          id: 'dev-aolon-1',
+          name: 'Aolon GT6 Pro (Google Health Connect)',
+          category: 'wearable',
+          status: 'connected',
+          battery: 88,
+          lastSync: 'Baru saja',
+          metricLabel: 'PPG Heart Rate & SpO2',
+          metricValue: '74 bpm • 98% SpO2',
+          metricUnit: 'LOINC 8867-4',
+          statusBadge: 'Google Health Connect Active'
+        };
+        setConnectedDevices((prev) => [...prev.filter((d) => d.id !== newDevice.id), newDevice]);
       }
       setIsGenerating(false);
       setIsDeviceModalOpen(false);
@@ -1603,6 +1617,22 @@ export default function GlassAIChatPage() {
                   <div className="text-xs text-slate-500">Real-time Interstitial Glucose (TIR 98%)</div>
                 </div>
                 <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  Hubungkan
+                </span>
+              </div>
+
+              {/* Aolon GT6 Pro / Google Health Connect */}
+              <div
+                onClick={() => handleConnectDevice('aolon')}
+                className="p-3 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 cursor-pointer transition-all flex items-center justify-between group"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-semibold text-slate-900 text-sm group-hover:text-emerald-700">
+                    Aolon GT6 Pro (Google Health Connect)
+                  </div>
+                  <div className="text-xs text-slate-500">Android Health Connect • 24/7 PPG Nadi, SpO2 & Langkah</div>
+                </div>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   Hubungkan
                 </span>
               </div>

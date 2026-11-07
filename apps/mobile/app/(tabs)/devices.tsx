@@ -219,6 +219,16 @@ const SCAN_CATALOG: DiscoveredDevice[] = [
     manufacturer: 'Garmin International',
     clearance: 'FDA Cleared ECG App',
   },
+  {
+    id: 'scan-aolon-gt6',
+    name: 'Aolon GT6 Pro Smartwatch',
+    model: 'GT6 Pro (Google Health Connect)',
+    type: 'smartwatch',
+    category: 'wearable',
+    rssi: -46,
+    manufacturer: 'Aolon / Da Fit Companion',
+    clearance: 'Google Health Connect • PPG Optical Sensor',
+  },
 ];
 
 export default function DevicesScreen() {
@@ -283,6 +293,20 @@ export default function DevicesScreen() {
     setIsPairing(true);
 
     setTimeout(() => {
+      let activeSensors = ['Telemetri Medis Real-time'];
+      let metricsSummary = 'Tersambung & Siap Mengukur';
+
+      if (pairingCandidate.id === 'scan-aolon-gt6') {
+        activeSensors = [
+          '❤️ 24/7 PPG Optical Heart Rate (LOINC 8867-4)',
+          '💨 SpO2 Blood Oxygen Saturation (LOINC 59408-5)',
+          '🩸 Blood Pressure Pulse Wave Analysis (Estimasi)',
+          '🌙 Sleep Stage Architecture (Deep / REM / Light)',
+          '🚶 Google Health Connect Step & Activity Sync',
+        ];
+        metricsSummary = '74 BPM Nadi • 98% SpO2 • 8,420 Langkah (Google Health Connect)';
+      }
+
       const newDevice: MedicalDevice = {
         id: `dev-${Date.now()}`,
         name: pairingCandidate.name,
@@ -295,8 +319,8 @@ export default function DevicesScreen() {
         regulatoryClearance: pairingCandidate.clearance,
         signalQuality: 98,
         firmwareVersion: 'v1.0.0',
-        activeSensors: ['Telemetri Medis Real-time'],
-        metricsSummary: 'Tersambung & Siap Mengukur',
+        activeSensors: activeSensors,
+        metricsSummary: metricsSummary,
       };
 
       setDevices((prev) => [...prev, newDevice]);
@@ -839,6 +863,49 @@ export default function DevicesScreen() {
               {isScanning && (
                 <ActivityIndicator size="small" color="#007AFF" style={{ marginTop: 12 }} />
               )}
+            </View>
+
+            {/* Google Health Connect Integration Card */}
+            <View
+              style={{
+                backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+                borderWidth: 1,
+                borderColor: '#34A853',
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                <Ionicons name="logo-google" size={20} color="#34A853" style={{ marginRight: 8 }} />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: isDark ? '#FFFFFF' : '#000000' }}>
+                  Google Health Connect (Android)
+                </Text>
+              </View>
+              <Text style={{ fontSize: 12, color: isDark ? '#A1A1A6' : '#666668', lineHeight: 18, marginBottom: 12 }}>
+                Punya smartwatch Aolon GT6 Pro, Xiaomi, Huawei, atau Da Fit? Sinkronkan data detak jantung (PPG), SpO2, tidur, dan langkah secara otomatis via Google Health Connect.
+              </Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#34A853',
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                }}
+                onPress={() => {
+                  const aolonCandidate = SCAN_CATALOG.find((d) => d.id === 'scan-aolon-gt6');
+                  if (aolonCandidate) {
+                    setPairingCandidate(aolonCandidate);
+                  }
+                }}
+              >
+                <Ionicons name="sync" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
+                <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>
+                  Sinkronkan Aolon GT6 Pro / Health Connect
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* Discovered List */}
