@@ -15,6 +15,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { PilloAvatar } from '@/components/PilloAvatar';
+import { PilloReminderModal, PilloMedication } from '@/components/PilloReminderModal';
 
 interface MedicationItem {
   id: string;
@@ -261,6 +263,10 @@ export default function TherapyControlScreen() {
 
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'meds' | 'vitals' | 'habits' | 'report'>('vitals');
+
+  // Pillo Smart Reminder State
+  const [pilloModalVisible, setPilloModalVisible] = useState(false);
+  const [selectedPilloMed, setSelectedPilloMed] = useState<PilloMedication | undefined>(undefined);
 
   // Medications state
   const [medications, setMedications] = useState<MedicationItem[]>(INITIAL_MEDICATIONS);
@@ -658,6 +664,57 @@ export default function TherapyControlScreen() {
               </View>
             )}
 
+            {/* PILLO SMART REMINDER HERO BANNER */}
+            <TouchableOpacity
+              activeOpacity={0.88}
+              style={[styles.pilloHeroBanner, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
+              onPress={() => router.push('/pillo-reminder')}
+            >
+              <View style={styles.pilloHeroLeft}>
+                <View style={styles.pilloHeroBadge}>
+                  <Ionicons name="flash" size={12} color="#007AFF" />
+                  <Text style={styles.pilloHeroBadgeText}>TEKNOLOGI PILLO.CARE</Text>
+                </View>
+                <Text style={[styles.pilloHeroTitle, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                  Alarm Obat Pantang Menyerah
+                </Text>
+                <Text style={styles.pilloHeroSub}>
+                  Karakter cerdas Pillo berdering non-stop di layar penuh hingga obat diminum
+                </Text>
+                <View style={styles.pilloHeroActionRow}>
+                  <TouchableOpacity
+                    style={styles.pilloHeroTestBtn}
+                    onPress={() => {
+                      setSelectedPilloMed({
+                        id: 'med-2',
+                        name: 'Metformin HCl',
+                        strength: '500 mg',
+                        dosePerIntake: 1,
+                        doseUnit: 'tablet',
+                        scheduledTime: '12:30 WIB',
+                        instruction: 'Bersama Makan Siang',
+                        indication: 'Kontrol Glukosa Darah',
+                        remainingStock: 18,
+                      });
+                      setPilloModalVisible(true);
+                    }}
+                  >
+                    <Ionicons name="notifications" size={13} color="#FFFFFF" />
+                    <Text style={styles.pilloHeroTestBtnText}>Uji Alarm Layar Penuh</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.pilloHeroOpenBtn}
+                    onPress={() => router.push('/pillo-reminder')}
+                  >
+                    <Text style={styles.pilloHeroOpenBtnText}>Atur Pillo →</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.pilloHeroRight}>
+                <PilloAvatar mood="calm" size={68} />
+              </View>
+            </TouchableOpacity>
+
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>JADWAL & KONTROL STOK OBAT PASIEN</Text>
               <TouchableOpacity onPress={() => setAddMedModalVisible(true)}>
@@ -781,17 +838,40 @@ export default function TherapyControlScreen() {
 
                   {/* Bottom: Restock Button & Intake Action */}
                   <View style={styles.medCardBottom}>
-                    <TouchableOpacity
-                      style={styles.restockQuickBtn}
-                      onPress={() => {
-                        setSelectedMedForRestock(med);
-                        setRestockAmount('30');
-                        setRestockModalVisible(true);
-                      }}
-                    >
-                      <Ionicons name="add-circle-outline" size={14} color="#007AFF" />
-                      <Text style={styles.restockQuickBtnText}>+ Restok Obat</Text>
-                    </TouchableOpacity>
+                    <View style={styles.medCardBottomLeft}>
+                      <TouchableOpacity
+                        style={styles.restockQuickBtn}
+                        onPress={() => {
+                          setSelectedMedForRestock(med);
+                          setRestockAmount('30');
+                          setRestockModalVisible(true);
+                        }}
+                      >
+                        <Ionicons name="add-circle-outline" size={14} color="#007AFF" />
+                        <Text style={styles.restockQuickBtnText}>+ Restok</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.pilloQuickAlarmBtn}
+                        onPress={() => {
+                          setSelectedPilloMed({
+                            id: med.id,
+                            name: med.name,
+                            strength: med.strength,
+                            dosePerIntake: med.dosePerIntake,
+                            doseUnit: med.doseUnit,
+                            scheduledTime: med.scheduledTime,
+                            instruction: med.instruction,
+                            indication: med.indication,
+                            remainingStock: med.remainingStock,
+                          });
+                          setPilloModalVisible(true);
+                        }}
+                      >
+                        <Ionicons name="alarm" size={13} color="#FF9500" />
+                        <Text style={styles.pilloQuickAlarmText}>Alarm Pillo</Text>
+                      </TouchableOpacity>
+                    </View>
 
                     <View style={styles.medActionButtonsRow}>
                       {!isTaken && (
@@ -1881,6 +1961,17 @@ export default function TherapyControlScreen() {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* ================= FULL SCREEN PILLO SMART ALARM ================= */}
+      <PilloReminderModal
+        visible={pilloModalVisible}
+        medication={selectedPilloMed}
+        initialMood="calm"
+        onClose={() => setPilloModalVisible(false)}
+        onTakeNow={(med) => handleMarkMedication(med.id, 'taken')}
+        onSkip={(med, reason) => handleMarkMedication(med.id, 'skipped')}
+        onReschedule={(med, mins) => handleMarkMedication(med.id, 'snoozed')}
+      />
     </SafeAreaView>
   );
 }
@@ -2936,5 +3027,98 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: '#34C759',
     fontWeight: '600',
+  },
+  // Pillo Hero Banner
+  pilloHeroBanner: {
+    flexDirection: 'row',
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#007AFF25',
+  },
+  pilloHeroLeft: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  pilloHeroBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
+  pilloHeroBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#007AFF',
+    letterSpacing: 0.5,
+  },
+  pilloHeroTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 3,
+  },
+  pilloHeroSub: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#8E8E93',
+    marginBottom: 10,
+  },
+  pilloHeroActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pilloHeroTestBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+    gap: 5,
+  },
+  pilloHeroTestBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  pilloHeroOpenBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 7,
+  },
+  pilloHeroOpenBtnText: {
+    color: '#007AFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  pilloHeroRight: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 4,
+  },
+  medCardBottomLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pilloQuickAlarmBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF950015',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 4,
+  },
+  pilloQuickAlarmText: {
+    color: '#FF9500',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

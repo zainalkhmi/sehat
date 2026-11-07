@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,6 +15,8 @@ import { Colors } from '@/constants/theme';
 import { useAccount } from '@spezivibe/account';
 import { AccountButton } from '@/components/account/account-button';
 import { useAccountSheet } from './_layout';
+import { PilloAvatar } from '@/components/PilloAvatar';
+import { PilloReminderModal } from '@/components/PilloReminderModal';
 
 interface SixPackMenuItem {
   id: string;
@@ -94,6 +96,7 @@ export default function HomeScreen() {
   const isDark = colorScheme === 'dark';
   const { signedIn } = useAccount();
   const { showAccountSheet } = useAccountSheet();
+  const [pilloModalVisible, setPilloModalVisible] = useState(false);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: isDark ? '#000000' : '#F2F2F7' }]}>
@@ -206,18 +209,18 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* MYTHERAPY ACTIVE MEDICATION REMINDER WIDGET */}
+        {/* PILLO CARE ACTIVE MEDICATION REMINDER WIDGET */}
         <TouchableOpacity
           activeOpacity={0.88}
-          onPress={() => router.push('/mytherapy')}
+          onPress={() => router.push('/pillo-reminder')}
           style={[styles.medReminderBanner, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
         >
           <View style={styles.medReminderTop}>
             <View style={styles.medReminderHeaderLeft}>
               <View style={styles.medPillIcon}>
-                <Ionicons name="alarm" size={16} color="#FF9500" />
+                <Ionicons name="flash" size={16} color="#007AFF" />
               </View>
-              <Text style={styles.medReminderHeaderTitle}>PENGINGAT OBAT MYTHERAPY</Text>
+              <Text style={styles.medReminderHeaderTitle}>PILLO CARE • PENGINGAT OBAT</Text>
             </View>
             <View style={styles.medTimeBadge}>
               <Text style={styles.medTimeBadgeText}>20:00 WIB (Malam)</Text>
@@ -225,19 +228,27 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.medReminderBody}>
+            <View style={styles.pilloMiniAvatarWrap}>
+              <PilloAvatar mood="calm" size={48} />
+            </View>
+
             <View style={styles.medReminderInfo}>
               <Text style={[styles.medReminderName, { color: isDark ? '#FFFFFF' : '#000000' }]}>
                 Candesartan Cilexetil 8 mg
               </Text>
               <Text style={styles.medReminderSub}>
-                1 Tablet • Sesudah Makan Malam (Proteksi Kardiovaskular)
+                1 Tablet • Sesudah Makan Malam (Proteksi Jantung)
               </Text>
             </View>
 
-            <View style={styles.medReminderTakeBtn}>
-              <Ionicons name="checkmark-circle" size={16} color="#FFFFFF" />
-              <Text style={styles.medReminderTakeBtnText}>Minum</Text>
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.medReminderTakeBtn}
+              onPress={() => setPilloModalVisible(true)}
+            >
+              <Ionicons name="alarm" size={16} color="#FFFFFF" />
+              <Text style={styles.medReminderTakeBtnText}>Alarm</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
 
@@ -303,6 +314,12 @@ export default function HomeScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Pillo Full-Screen Alarm Modal */}
+      <PilloReminderModal
+        visible={pilloModalVisible}
+        onClose={() => setPilloModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -600,6 +617,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
+  },
+  pilloMiniAvatarWrap: {
+    marginRight: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   medReminderInfo: {
     flex: 1,
