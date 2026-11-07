@@ -136,6 +136,19 @@ export default function GlassAIChatPage() {
   const [uploadedDocuments, setUploadedDocuments] = useState<UploadedDocument[]>([]);
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([]);
 
+  // Patient Overview State
+  const [isOverviewGenerated, setIsOverviewGenerated] = useState(false);
+  const [isRefreshingOverview, setIsRefreshingOverview] = useState(false);
+  const [selectedOrgan, setSelectedOrgan] = useState<string | null>(null);
+
+  const handleRefreshOverview = () => {
+    setIsRefreshingOverview(true);
+    setTimeout(() => {
+      setIsOverviewGenerated((prev) => !prev);
+      setIsRefreshingOverview(false);
+    }, 600);
+  };
+
   // Auto-scroll chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1164,63 +1177,357 @@ export default function GlassAIChatPage() {
               </div>
             )}
 
-            {/* TAB 3: PROFILE (Patient Profile & Encounter Overview) */}
+            {/* TAB 3: PROFILE (Patient Profile & Encounter Overview - Glass Health UI) */}
             {activeTab === 'patient' && (
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 tracking-tight">Patient Overview</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">Clinical Profile & Encounter Context</p>
+              <div className="space-y-4">
+                {/* Header (Faithful to Screenshot) */}
+                <div className="flex items-center justify-between pb-1">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">Patient Overview</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {isOverviewGenerated
+                        ? 'Overview generated • 3 sources synced'
+                        : 'No overview generated yet'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleRefreshOverview}
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200/60 shadow-2xs"
+                    title="Refresh Patient Overview"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isRefreshingOverview ? 'animate-spin' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
                 </div>
 
-                {/* Patient Demographics Card */}
-                <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900">Ahmad Kusuma</h3>
-                      <p className="text-xs text-slate-500">
-                        MRN: <span className="font-mono text-slate-700 font-semibold">FH-PT-1002</span> • 38 tahun (Pria)
-                      </p>
+                {/* 2-Column Responsive Grid (Exact Match to Screenshot) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Left Column: Digital Twin & Health History */}
+                  <div className="space-y-4 flex flex-col">
+                    {/* Card 1: Digital Twin */}
+                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs flex-1 flex flex-col">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-slate-800">Digital Twin</span>
+                        {selectedOrgan && (
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 animate-in fade-in">
+                            {selectedOrgan}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Holographic 3D Human Body Silhouette SVG */}
+                      <div className="flex-1 flex flex-col items-center justify-center py-2 relative min-h-[310px] select-none">
+                        <svg
+                          viewBox="0 0 200 360"
+                          className="w-48 h-72 sm:h-80 drop-shadow-md transition-transform hover:scale-102 duration-300"
+                        >
+                          <defs>
+                            <linearGradient id="bodyGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
+                              <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.65" />
+                              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.5" />
+                            </linearGradient>
+                            <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="#ff4d6d" stopOpacity="0.95" />
+                              <stop offset="70%" stopColor="#e11d48" stopOpacity="0.8" />
+                              <stop offset="100%" stopColor="#be123c" stopOpacity="0.1" />
+                            </radialGradient>
+                            <radialGradient id="brainGlow" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.9" />
+                              <stop offset="100%" stopColor="#0284c7" stopOpacity="0.2" />
+                            </radialGradient>
+                            <radialGradient id="metabolicGlow" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
+                              <stop offset="100%" stopColor="#0369a1" stopOpacity="0.1" />
+                            </radialGradient>
+                            <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                              <feGaussianBlur stdDeviation="3" result="blur" />
+                              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                          </defs>
+
+                          {/* Aura Background Glow */}
+                          <ellipse cx="100" cy="180" rx="45" ry="140" fill="#38bdf8" opacity="0.08" filter="url(#softGlow)" />
+
+                          {/* Head */}
+                          <ellipse cx="100" cy="38" rx="14" ry="18" fill="url(#bodyGlow)" stroke="#7dd3fc" strokeWidth="1" />
+                          <circle
+                            cx="100"
+                            cy="36"
+                            r="8"
+                            fill="url(#brainGlow)"
+                            className="cursor-pointer hover:opacity-100 transition-opacity"
+                            onClick={() => setSelectedOrgan('Brain & Cognition: Sleep 7h 24m, Minimal Stress')}
+                          />
+
+                          {/* Neck */}
+                          <path d="M94 54 L94 65 L106 65 L106 54 Z" fill="url(#bodyGlow)" />
+
+                          {/* Torso & Shoulders */}
+                          <path
+                            d="M68 76 C74 68, 88 64, 100 64 C112 64, 126 68, 132 76 C138 84, 132 105, 128 135 C125 155, 126 175, 122 188 C118 194, 82 194, 78 188 C74 175, 75 155, 72 135 C68 105, 62 84, 68 76 Z"
+                            fill="url(#bodyGlow)"
+                            stroke="#38bdf8"
+                            strokeWidth="1.2"
+                            strokeOpacity="0.7"
+                          />
+
+                          {/* Translucent Ribcage lines */}
+                          <path d="M85 88 C95 84, 105 84, 115 88" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
+                          <path d="M82 98 C94 94, 106 94, 118 98" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
+                          <path d="M84 108 C94 104, 106 104, 116 108" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
+                          <path d="M86 118 C94 114, 106 114, 114 118" stroke="#bae6fd" strokeWidth="0.8" strokeOpacity="0.6" fill="none" />
+
+                          {/* Spinal Column */}
+                          <line x1="100" y1="65" x2="100" y2="185" stroke="#e0f2fe" strokeWidth="1.5" strokeDasharray="3 2" strokeOpacity="0.5" />
+
+                          {/* Lungs Silhouette */}
+                          <path
+                            d="M86 85 C82 95, 82 115, 88 120 C92 120, 95 105, 95 90 Z"
+                            fill="#0284c7"
+                            fillOpacity="0.25"
+                            className="cursor-pointer hover:fill-opacity-40"
+                            onClick={() => setSelectedOrgan('Respiratory: SpO2 98% • RR 16 x/min')}
+                          />
+                          <path
+                            d="M114 85 C118 95, 118 115, 112 120 C108 120, 105 105, 105 90 Z"
+                            fill="#0284c7"
+                            fillOpacity="0.25"
+                            className="cursor-pointer hover:fill-opacity-40"
+                            onClick={() => setSelectedOrgan('Respiratory: SpO2 98% • RR 16 x/min')}
+                          />
+
+                          {/* Pulsing Glowing Heart */}
+                          <g
+                            className="cursor-pointer"
+                            onClick={() => setSelectedOrgan('Cardiovascular: BP 118/76 mmHg • HR 72 bpm • Normal Dipper')}
+                          >
+                            <circle cx="106" cy="102" r="11" fill="url(#heartGlow)" filter="url(#softGlow)" className="animate-pulse" />
+                            <circle cx="106" cy="102" r="5" fill="#fda4af" />
+                          </g>
+
+                          {/* Metabolic Center (Liver & Pancreas) */}
+                          <ellipse
+                            cx="98"
+                            cy="138"
+                            rx="14"
+                            ry="9"
+                            fill="url(#metabolicGlow)"
+                            className="cursor-pointer hover:opacity-100 transition-opacity"
+                            onClick={() => setSelectedOrgan('Metabolism: Glucose 104 mg/dL • HbA1c 5.8%')}
+                          />
+
+                          {/* Arms */}
+                          {/* Left Arm */}
+                          <path
+                            d="M68 76 C62 90, 58 115, 56 140 C54 160, 50 185, 48 205 C46 210, 48 218, 52 216 C55 214, 58 195, 62 175 C66 155, 70 130, 72 108"
+                            fill="url(#bodyGlow)"
+                            stroke="#38bdf8"
+                            strokeWidth="0.8"
+                            strokeOpacity="0.5"
+                          />
+                          {/* Right Arm */}
+                          <path
+                            d="M132 76 C138 90, 142 115, 144 140 C146 160, 150 185, 152 205 C154 210, 152 218, 148 216 C145 214, 142 195, 138 175 C134 155, 130 130, 128 108"
+                            fill="url(#bodyGlow)"
+                            stroke="#38bdf8"
+                            strokeWidth="0.8"
+                            strokeOpacity="0.5"
+                          />
+
+                          {/* Pelvis */}
+                          <path d="M78 188 C82 200, 118 200, 122 188 L116 215 L84 215 Z" fill="url(#bodyGlow)" stroke="#38bdf8" strokeWidth="0.8" strokeOpacity="0.5" />
+
+                          {/* Legs */}
+                          {/* Left Leg */}
+                          <path
+                            d="M84 215 C82 235, 80 265, 82 290 C83 310, 80 335, 78 350 C80 354, 88 354, 90 350 C93 335, 94 310, 95 290 C96 265, 98 235, 98 215 Z"
+                            fill="url(#bodyGlow)"
+                            stroke="#38bdf8"
+                            strokeWidth="0.9"
+                            strokeOpacity="0.6"
+                          />
+                          {/* Right Leg */}
+                          <path
+                            d="M116 215 C118 235, 120 265, 118 290 C117 310, 120 335, 122 350 C120 354, 112 354, 110 350 C107 335, 106 310, 105 290 C104 265, 102 235, 102 215 Z"
+                            fill="url(#bodyGlow)"
+                            stroke="#38bdf8"
+                            strokeWidth="0.9"
+                            strokeOpacity="0.6"
+                          />
+
+                          {/* Femoral Vascular tracings */}
+                          <path d="M98 185 L90 250 L88 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.4" fill="none" />
+                          <path d="M102 185 L110 250 L112 320" stroke="#f43f5e" strokeWidth="0.8" strokeOpacity="0.4" fill="none" />
+                        </svg>
+
+                        {/* Interactive Organ Hotspots Prompt */}
+                        <div className="mt-2 text-center">
+                          <p className="text-[11px] text-slate-400">
+                            {selectedOrgan ? (
+                              <span className="text-sky-700 font-semibold">{selectedOrgan}</span>
+                            ) : (
+                              'Klik organ tubuh untuk membedah telemetri sistemik'
+                            )}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      Consent Verified
-                    </span>
+
+                    {/* Card 2: Health History */}
+                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
+                      <div className="text-xs font-semibold text-slate-800 mb-2">
+                        Health History
+                      </div>
+                      {!isOverviewGenerated && connectedRecords.length === 0 ? (
+                        <p className="text-xs text-slate-400 py-3">No health history yet</p>
+                      ) : (
+                        <div className="space-y-2 text-xs divide-y divide-slate-100">
+                          <div className="pt-1.5 space-y-0.5">
+                            <span className="font-semibold text-slate-800">Riwayat Penyakit Dahulu (RPD)</span>
+                            <p className="text-slate-500">Hipertensi Stage 1 terdiagnosis 2024. Riwayat dislipidemia terkontrol.</p>
+                          </div>
+                          <div className="pt-2 space-y-0.5">
+                            <span className="font-semibold text-slate-800">Riwayat Penyakit Keluarga (RPK)</span>
+                            <p className="text-slate-500">Ayah: Infark Miokard akut pada usia 62 th. Ibu: DM Tipe 2.</p>
+                          </div>
+                          <div className="pt-2 space-y-0.5">
+                            <span className="font-semibold text-slate-800">Gaya Hidup & Imunisasi</span>
+                            <p className="text-slate-500">Non-perokok, jalan kaki rata-rata 8.420 langkah/hari. Vaksin Influenza 2026.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 text-xs">
-                    <div>
-                      <span className="text-slate-400 block">Kondisi Aktif</span>
-                      <span className="font-semibold text-slate-800">Hipertensi Esensial (ICD-10 I10)</span>
+                  {/* Right Column: Connected Sources, Health Insights, Active Conditions */}
+                  <div className="space-y-4 flex flex-col">
+                    {/* Card 3: Connected Sources */}
+                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-slate-800">Connected Sources</span>
+                        {connectedDevices.length > 0 && (
+                          <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            {connectedDevices.length} Connected
+                          </span>
+                        )}
+                      </div>
+                      {!isOverviewGenerated && connectedDevices.length === 0 && connectedRecords.length === 0 ? (
+                        <div className="py-4">
+                          <p className="text-xs text-slate-400">No connected sources yet.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 text-xs">
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div className="flex items-center space-x-2">
+                              <Activity className="w-3.5 h-3.5 text-blue-600" />
+                              <span className="font-medium text-slate-800">OMRON Complete Smart BP</span>
+                            </div>
+                            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">118/76 mmHg</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div className="flex items-center space-x-2">
+                              <Watch className="w-3.5 h-3.5 text-slate-700" />
+                              <span className="font-medium text-slate-800">Apple Watch Ultra 2</span>
+                            </div>
+                            <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">72 bpm • Active</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div className="flex items-center space-x-2">
+                              <Database className="w-3.5 h-3.5 text-emerald-600" />
+                              <span className="font-medium text-slate-800">SatuSehat Kemenkes (IHS)</span>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-500">IH-10029381</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <span className="text-slate-400 block">Alergi Obat</span>
-                      <span className="font-semibold text-rose-600">Penisilin (Urtikaria)</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block">Dokter DPJP</span>
-                      <span className="font-semibold text-slate-800">Dr. Sarah Wijaya, Sp.JP</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block">Faskes Primer</span>
-                      <span className="font-semibold text-slate-800">Puskesmas Kebayoran Baru</span>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Regimen & Targets */}
-                <div className="rounded-xl border border-slate-200/90 p-5 bg-white shadow-2xs space-y-3">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Target Terapi & Kepatuhan</h4>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                      <span className="text-slate-700 font-medium">Target Tekanan Darah (PERHI)</span>
-                      <span className="font-bold text-slate-900">&lt; 130/80 mmHg</span>
+                    {/* Card 4: Health Insights */}
+                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
+                      <div className="text-xs font-semibold text-slate-800 mb-2">
+                        Health Insights
+                      </div>
+                      {!isOverviewGenerated && connectedDevices.length === 0 ? (
+                        <div className="py-4">
+                          <p className="text-xs text-slate-400">No health insights yet</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5 text-xs">
+                          <div className="p-2.5 rounded-lg bg-sky-50/60 border border-sky-100 space-y-1">
+                            <div className="flex items-center justify-between font-semibold text-sky-900">
+                              <span className="flex items-center gap-1.5">
+                                <HeartPulse className="w-3.5 h-3.5 text-sky-600" />
+                                Circadian Dipping Normal
+                              </span>
+                              <span className="text-[10px] text-sky-600 bg-white px-1.5 py-0.5 rounded border border-sky-200">12.4% Drop</span>
+                            </div>
+                            <p className="text-slate-600 text-[11px] leading-relaxed">
+                              Penurunan tekanan darah malam hari berada dalam rentang fisiologis ideal (*Normal Dipper*), mengindikasikan proteksi organ target yang baik.
+                            </p>
+                          </div>
+
+                          <div className="p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-100 space-y-1">
+                            <div className="flex items-center justify-between font-semibold text-emerald-900">
+                              <span className="flex items-center gap-1.5">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                Adherensi Farmakoterapi Tinggi
+                              </span>
+                              <span className="text-[10px] text-emerald-700 bg-white px-1.5 py-0.5 rounded border border-emerald-200">96% Tercatat</span>
+                            </div>
+                            <p className="text-slate-600 text-[11px] leading-relaxed">
+                              Kepatuhan konsumsi Amlodipine 5mg tepat waktu teratur selama 30 hari berturut-turut via asisten Pillo.
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                      <span className="text-slate-700 font-medium">Kepatuhan Amlodipine 5mg</span>
-                      <span className="font-bold text-emerald-700">96% (Terkontrol)</span>
-                    </div>
-                    <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50">
-                      <span className="text-slate-700 font-medium">Target Glikemik HbA1c</span>
-                      <span className="font-bold text-slate-900">&lt; 6.5% (Tercapai: 5.8%)</span>
+
+                    {/* Card 5: Active Conditions, Medications, & Allergies */}
+                    <div className="rounded-xl border border-slate-200/90 p-4 bg-white shadow-2xs">
+                      <div className="text-xs font-semibold text-slate-800 mb-2">
+                        Active Conditions, Medications, & Allergies
+                      </div>
+                      {!isOverviewGenerated && connectedRecords.length === 0 ? (
+                        <div className="py-4">
+                          <p className="text-xs text-slate-400">No active conditions recorded yet.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 text-xs">
+                          <div>
+                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Kondisi Aktif</span>
+                            <div className="flex flex-wrap gap-1.5">
+                              <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                                Hipertensi Esensial (ICD-10 I10)
+                              </span>
+                              <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-medium">
+                                Prediabetes (ICD-10 R73.03)
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Medikasi Berjalan</span>
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-slate-700">
+                                <span className="font-semibold text-slate-800">Amlodipine Besylate 5 mg</span>
+                                <span className="text-slate-500">1x1 Pagi</span>
+                              </div>
+                              <div className="flex items-center justify-between text-slate-700">
+                                <span className="font-semibold text-slate-800">Metformin HCl 500 mg</span>
+                                <span className="text-slate-500">2x1 Bersama Makan</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-1">Alergi Terverifikasi</span>
+                            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200 font-semibold inline-block">
+                              Penisilin (Reaksi: Urtikaria / Ruam Akut)
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
