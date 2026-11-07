@@ -29,6 +29,8 @@ export function ChatView({
   emptyState,
   systemPrompt,
   containerStyle,
+  initialInput,
+  onInputRef,
 }: ChatViewProps) {
   const theme = useMemo(
     () => mergeChatTheme(userTheme, defaultLightChatTheme),
@@ -38,9 +40,21 @@ export function ChatView({
   const flatListRef = useRef<FlatList>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialInput || '');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialInput !== undefined) {
+      setInput(initialInput);
+    }
+  }, [initialInput]);
+
+  useEffect(() => {
+    if (onInputRef) {
+      onInputRef(setInput);
+    }
+  }, [onInputRef]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

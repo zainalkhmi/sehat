@@ -25,26 +25,29 @@ export interface StreamCallbacks {
  */
 function createModel(provider: ChatProvider): LanguageModel {
   const model = provider.model || DEFAULT_MODELS[provider.type];
+  const customFetch = (typeof window !== 'undefined' && typeof window.fetch === 'function')
+    ? window.fetch.bind(window)
+    : (expoFetch as unknown as typeof globalThis.fetch);
 
   switch (provider.type) {
     case 'openai': {
       const openai = createOpenAI({
         apiKey: provider.apiKey,
-        fetch: expoFetch as unknown as typeof globalThis.fetch,
+        fetch: customFetch,
       });
       return openai(model);
     }
     case 'anthropic': {
       const anthropic = createAnthropic({
         apiKey: provider.apiKey,
-        fetch: expoFetch as unknown as typeof globalThis.fetch,
+        fetch: customFetch,
       });
       return anthropic(model);
     }
     case 'google': {
       const google = createGoogleGenerativeAI({
         apiKey: provider.apiKey,
-        fetch: expoFetch as unknown as typeof globalThis.fetch,
+        fetch: customFetch,
       });
       return google(model);
     }

@@ -44,7 +44,7 @@ export type ChatProvider = OpenAIProvider | AnthropicProvider | GoogleProvider;
 export const DEFAULT_MODELS: Record<ChatProviderType, string> = {
   openai: 'gpt-4o-mini',
   anthropic: 'claude-sonnet-4-20250514',
-  google: 'gemini-2.0-flash',
+  google: 'gemini-2.5-flash',
 };
 
 /**
@@ -128,6 +128,10 @@ export interface ChatViewProps {
   systemPrompt?: string;
   /** Custom container style */
   containerStyle?: ViewStyle;
+  /** Initial or external text to populate in input */
+  initialInput?: string;
+  /** Expose setInput setter for external suggestion pills */
+  onInputRef?: (setInput: (val: string) => void) => void;
 }
 
 /**
