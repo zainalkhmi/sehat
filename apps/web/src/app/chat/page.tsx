@@ -419,7 +419,7 @@ export default function GlassAIChatPage() {
             </Link>
             <span className="text-slate-300">/</span>
             <span className="font-semibold text-slate-900 tracking-tight flex items-center gap-1.5">
-              <span>Ahmad Kusuma (jouhou kyb)</span>
+              <span>Ahmad Kusuma</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
             </span>
             <span className="text-slate-400">/</span>
@@ -859,7 +859,7 @@ export default function GlassAIChatPage() {
                     : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                jouhou kyb
+                Profile
               </button>
 
               <button
@@ -1164,7 +1164,7 @@ export default function GlassAIChatPage() {
               </div>
             )}
 
-            {/* TAB 3: JOUHOU KYB (Patient Profile & Encounter Overview) */}
+            {/* TAB 3: PROFILE (Patient Profile & Encounter Overview) */}
             {activeTab === 'patient' && (
               <div className="space-y-6">
                 <div>
@@ -1398,3 +1398,4 @@ export default function GlassAIChatPage() {
     </div>
   );
 }
+
