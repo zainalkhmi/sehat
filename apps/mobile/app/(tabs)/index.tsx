@@ -39,14 +39,14 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/halo-dokter',
   },
   {
-    id: 'therapy-control',
-    title: 'Kontrol Terapi',
-    subtitle: 'Pengingat obat & vital MyTherapy',
+    id: 'mytherapy',
+    title: 'MyTherapy',
+    subtitle: 'Kontrol obat & catat tensi',
     icon: 'alarm',
     color: '#FF9500',
     bgColor: '#FF950015',
-    badge: '94% Patuh',
-    route: '/therapy-control',
+    badge: 'MyTherapy',
+    route: '/mytherapy',
   },
   {
     id: 'measurements',
@@ -209,7 +209,7 @@ export default function HomeScreen() {
         {/* MYTHERAPY ACTIVE MEDICATION REMINDER WIDGET */}
         <TouchableOpacity
           activeOpacity={0.88}
-          onPress={() => router.push('/therapy-control')}
+          onPress={() => router.push('/mytherapy')}
           style={[styles.medReminderBanner, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
         >
           <View style={styles.medReminderTop}>
