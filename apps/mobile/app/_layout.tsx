@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useSegments, useRouter, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
@@ -159,7 +159,14 @@ function AppProviders({ children }: { children: React.ReactNode }) {
   const { accountService, isLoading } = useStandard();
 
   if (isLoading) {
-    return null; // Keep showing splash screen
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8FAFC' }}>
+        <ActivityIndicator size="large" color="#0EA5E9" />
+        <Text style={{ marginTop: 12, color: '#64748B', fontSize: 13, fontWeight: '500' }}>
+          Memuat aplikasi Sehat...
+        </Text>
+      </View>
+    );
   }
 
   return (

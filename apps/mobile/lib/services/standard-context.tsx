@@ -63,10 +63,13 @@ export function StandardProvider({
         const config = getBackendConfig();
         const backendInstance = BackendFactory.createBackend(config);
 
-        await Promise.all([
+        // Safety timeout of 2.5s to prevent hanging on initial load
+        const initPromise = Promise.all([
           backendInstance.initialize(),
           scheduler.initialize(),
         ]);
+        const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 2500));
+        await Promise.race([initPromise, timeoutPromise]);
 
         if (cancelled) return;
 
