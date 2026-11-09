@@ -44,6 +44,7 @@ import {
   FilePlus,
   Info
 } from 'lucide-react';
+import GlassClinicalWorkspace from '@/components/GlassClinicalWorkspace';
 
 interface ChatMessage {
   id: string;
@@ -104,7 +105,7 @@ interface GeneratedFile {
 
 export default function GlassAIChatPage() {
   // Navigation & View States
-  const [activeTab, setActiveTab] = useState<'patient' | 'data' | 'documents'>('documents');
+  const [activeTab, setActiveTab] = useState<'patient' | 'data' | 'documents' | 'soap'>('soap');
   const [dataSubFilter, setDataSubFilter] = useState<'metrics' | 'records'>('metrics');
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -481,19 +482,18 @@ export default function GlassAIChatPage() {
     }, 750);
   };
 
-  // Audio Toggle Simulation
+  // Ambient Clinical Scribing Audio Toggle (Glass Health Style)
   const toggleAmbientAudio = () => {
     if (!isRecordingAudio) {
       setIsRecordingAudio(true);
-      setAudioTranscript('Mendengarkan percakapan klinis...');
+      setAudioTranscript('Ambient AI Scribing: Mendengarkan dialog dokter dan Tn. Ahmad Kusuma...');
       setTimeout(() => {
-        setAudioTranscript('Pasien: "Dokter, saya belakangan merasa tekanan darah di pagi hari agak tinggi..."');
+        setAudioTranscript('Dokter: "Bagaimana keluhan rasa dada tertekan?" | Pasien: "Terasa tertekan 3-5 menit saat naik tangga dok..."');
       }, 1500);
     } else {
       setIsRecordingAudio(false);
-      if (audioTranscript && audioTranscript.includes('Pasien:')) {
-        setInputMessage(audioTranscript.replace('Pasien: ', '').replace(/"/g, ''));
-      }
+      setActiveTab('soap');
+      setInputMessage('Encounter Note: Pasien Tn. Ahmad Kusuma (58 th) mengeluhkan nyeri dada retrosternal exertional. Evaluasi DDx Can\'t-Miss Red Flags & update SOAP Plan.');
       setAudioTranscript('');
     }
   };
@@ -722,6 +722,28 @@ export default function GlassAIChatPage() {
           <div className="p-4 bg-white/95 backdrop-blur-md border-t border-sky-100/90 shadow-lg shadow-sky-100/20">
             {/* Quick Prompt Suggestion Chips - VIBRANT & COLORFUL */}
             <div className="flex items-center space-x-2 overflow-x-auto pb-3 mb-1 no-scrollbar text-xs">
+              <button
+                onClick={() => {
+                  setActiveTab('soap');
+                  handleQuickChip('Formulasikan SOAP Note terstruktur dan Stratifikasi DDx berbasis pedoman klinis');
+                }}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 text-blue-900 font-bold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span>Glass AI SOAP Note</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('soap');
+                  handleQuickChip('Evaluasi Stratifikasi DDx & "Can\'t-Miss" Red Flags (ACS, Emboli Paru, Diseksi Aorta)');
+                }}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-900 font-bold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
+              >
+                <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                <span>Can&apos;t-Miss Red Flags</span>
+              </button>
+
               <button
                 onClick={() => handleQuickChip('Tolong jelaskan hasil tes laboratorium darah lengkap dan kardiometabolik terbaru')}
                 className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-amber-200/90 bg-amber-50/80 hover:bg-amber-100 text-amber-900 font-semibold whitespace-nowrap transition-all shadow-2xs hover:shadow-xs"
@@ -1024,6 +1046,21 @@ export default function GlassAIChatPage() {
                 {(uploadedDocuments.length > 0 || generatedFiles.length > 0) && (
                   <span className="w-2 h-2 rounded-full bg-white inline-block"></span>
                 )}
+              </button>
+
+              <button
+                onClick={() => setActiveTab('soap')}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  activeTab === 'soap'
+                    ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 text-white shadow-sm shadow-blue-500/25'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                }`}
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>SOAP & DDx</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-800 text-[9px] font-extrabold animate-pulse">
+                  Glass AI
+                </span>
               </button>
             </div>
 
@@ -1747,6 +1784,13 @@ export default function GlassAIChatPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* TAB 4: GLASS CLINICAL WORKSPACE (SOAP & DDx) */}
+            {activeTab === 'soap' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <GlassClinicalWorkspace />
               </div>
             )}
 
