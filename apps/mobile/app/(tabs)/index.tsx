@@ -41,14 +41,14 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/halo-dokter',
   },
   {
-    id: 'adaptive-habits',
-    title: 'Adaptive Habits',
-    subtitle: 'Mikro-rencana & setback recovery',
-    icon: 'repeat',
+    id: 'pillo-reminder',
+    title: 'Pillo Reminder',
+    subtitle: 'Alarm obat & interaksi farmakoterapi',
+    icon: 'alarm',
     color: '#FF9500',
     bgColor: '#FF950015',
-    badge: 'Abu Dhabi',
-    route: '/adaptive-habits',
+    badge: 'Aktif',
+    route: '/pillo-reminder',
   },
   {
     id: 'measurements',
@@ -158,51 +158,6 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
-
-        {/* FUTURE HEALTH: ADAPTIVE BEHAVIOR & SETBACK RECOVERY HERO CARD */}
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={() => router.push('/adaptive-habits')}
-          style={[styles.adaptiveHabitHeroCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
-        >
-          <View style={styles.adaptiveTopRow}>
-            <View style={styles.adaptiveBadgePill}>
-              <Ionicons name="sparkles" size={12} color="#007AFF" />
-              <Text style={styles.adaptiveBadgePillText}>FUTURE HEALTH CHALLENGE</Text>
-            </View>
-            <View style={styles.recoveryStatPill}>
-              <Ionicons name="shield-checkmark" size={12} color="#34C759" />
-              <Text style={styles.recoveryStatPillText}>24 Hari Tersimpan</Text>
-            </View>
-          </View>
-
-          <View style={styles.adaptiveMainBody}>
-            <View style={styles.adaptiveIconCircle}>
-              <Ionicons name="repeat" size={24} color="#007AFF" />
-            </View>
-
-            <View style={styles.adaptiveTextCol}>
-              <Text style={[styles.adaptiveTitleText, { color: isDark ? '#FFFFFF' : '#000000' }]}>
-                Adaptive Habit & Setback Recovery
-              </Text>
-              <Text style={styles.adaptiveSubText}>
-                Rencana mikro harian adaptif cuaca Abu Dhabi (41°C) & pemulihan tanpa reset streak.
-              </Text>
-            </View>
-
-            <View style={styles.adaptiveArrowWrap}>
-              <Ionicons name="chevron-forward" size={20} color="#007AFF" />
-            </View>
-          </View>
-
-          <View style={[styles.adaptiveFooterRow, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
-            <View style={styles.adaptiveFooterMetric}>
-              <Text style={styles.adaptiveFooterLabel}>Lapse Recovery Rate:</Text>
-              <Text style={styles.adaptiveFooterVal}>1.3 Hari (Top 5% Resilient)</Text>
-            </View>
-            <Text style={styles.adaptiveActionLink}>Buka Hub →</Text>
-          </View>
-        </TouchableOpacity>
 
         {/* CONNECTED DOCTOR LIVE CARD (HALO DOKTER) */}
         <TouchableOpacity
