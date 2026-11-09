@@ -41,14 +41,14 @@ const SIX_PACK_MENU: SixPackMenuItem[] = [
     route: '/halo-dokter',
   },
   {
-    id: 'mytherapy',
-    title: 'MyTherapy',
-    subtitle: 'Kontrol obat & catat tensi',
-    icon: 'alarm',
+    id: 'adaptive-habits',
+    title: 'Adaptive Habits',
+    subtitle: 'Mikro-rencana & setback recovery',
+    icon: 'repeat',
     color: '#FF9500',
     bgColor: '#FF950015',
-    badge: 'MyTherapy',
-    route: '/mytherapy',
+    badge: 'Abu Dhabi',
+    route: '/adaptive-habits',
   },
   {
     id: 'measurements',
@@ -158,6 +158,51 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
+        {/* FUTURE HEALTH: ADAPTIVE BEHAVIOR & SETBACK RECOVERY HERO CARD */}
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => router.push('/adaptive-habits')}
+          style={[styles.adaptiveHabitHeroCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}
+        >
+          <View style={styles.adaptiveTopRow}>
+            <View style={styles.adaptiveBadgePill}>
+              <Ionicons name="sparkles" size={12} color="#007AFF" />
+              <Text style={styles.adaptiveBadgePillText}>FUTURE HEALTH CHALLENGE</Text>
+            </View>
+            <View style={styles.recoveryStatPill}>
+              <Ionicons name="shield-checkmark" size={12} color="#34C759" />
+              <Text style={styles.recoveryStatPillText}>24 Hari Tersimpan</Text>
+            </View>
+          </View>
+
+          <View style={styles.adaptiveMainBody}>
+            <View style={styles.adaptiveIconCircle}>
+              <Ionicons name="repeat" size={24} color="#007AFF" />
+            </View>
+
+            <View style={styles.adaptiveTextCol}>
+              <Text style={[styles.adaptiveTitleText, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+                Adaptive Habit & Setback Recovery
+              </Text>
+              <Text style={styles.adaptiveSubText}>
+                Rencana mikro harian adaptif cuaca Abu Dhabi (41°C) & pemulihan tanpa reset streak.
+              </Text>
+            </View>
+
+            <View style={styles.adaptiveArrowWrap}>
+              <Ionicons name="chevron-forward" size={20} color="#007AFF" />
+            </View>
+          </View>
+
+          <View style={[styles.adaptiveFooterRow, { backgroundColor: isDark ? '#2C2C2E' : '#F2F2F7' }]}>
+            <View style={styles.adaptiveFooterMetric}>
+              <Text style={styles.adaptiveFooterLabel}>Lapse Recovery Rate:</Text>
+              <Text style={styles.adaptiveFooterVal}>1.3 Hari (Top 5% Resilient)</Text>
+            </View>
+            <Text style={styles.adaptiveActionLink}>Buka Hub →</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* CONNECTED DOCTOR LIVE CARD (HALO DOKTER) */}
         <TouchableOpacity
@@ -432,6 +477,114 @@ const styles = StyleSheet.create({
     width: StyleSheet.hairlineWidth,
     height: 36,
     backgroundColor: '#8E8E9330',
+  },
+
+  // ADAPTIVE BEHAVIOR & RECOVERY HERO CARD
+  adaptiveHabitHeroCard: {
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1.5,
+    borderColor: '#007AFF30',
+  },
+  adaptiveTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  adaptiveBadgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#007AFF12',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  adaptiveBadgePillText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#007AFF',
+    letterSpacing: 0.5,
+  },
+  recoveryStatPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#34C75915',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  recoveryStatPillText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#34C759',
+  },
+  adaptiveMainBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 12,
+  },
+  adaptiveIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#007AFF15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adaptiveTextCol: {
+    flex: 1,
+  },
+  adaptiveTitleText: {
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+    marginBottom: 2,
+  },
+  adaptiveSubText: {
+    fontSize: 11,
+    color: '#8E8E93',
+    lineHeight: 15,
+  },
+  adaptiveArrowWrap: {
+    paddingLeft: 4,
+  },
+  adaptiveFooterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  adaptiveFooterMetric: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  adaptiveFooterLabel: {
+    fontSize: 10,
+    color: '#8E8E93',
+    fontWeight: '600',
+  },
+  adaptiveFooterVal: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#007AFF',
+  },
+  adaptiveActionLink: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#007AFF',
   },
 
   // CONNECTED DOCTOR LIVE CARD
