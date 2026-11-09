@@ -2,10 +2,81 @@ import React, { useEffect, useRef } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useSegments, useRouter, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, ScrollView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, ActivityIndicator, LogBox } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import 'react-native-reanimated';
 import '@/assets/styles/global.css';
+
+// Suppress known non-fatal font loading timeouts in React Native LogBox
+LogBox.ignoreLogs([
+  '6000ms timeout exceeded',
+  'timeout exceeded',
+  'fontfaceobserver',
+  /timeout exceeded/i,
+  /fontfaceobserver/i,
+]);
+
+// Patch fontfaceobserver & error event listeners for Web preview environments
+if (Platform.OS === 'web' && typeof window !== 'undefined') {
+  try {
+    // 1. Monkey patch FontFaceObserver prototype to extend timeout & fallback gracefully
+    const FontObserver = require('fontfaceobserver');
+    if (FontObserver && FontObserver.prototype && FontObserver.prototype.load) {
+      const originalLoad = FontObserver.prototype.load;
+      FontObserver.prototype.load = function (text?: string, timeout: number = 6000) {
+        // Extend timeout to 30000ms (to give Metro on Windows time to compile) and catch errors gracefully
+        return originalLoad.call(this, text, Math.max(timeout, 30000)).catch((err: any) => {
+          console.warn(`[FontLoader] Font "${this.family}" loading timed out; continuing with system font fallback.`);
+          return this;
+        });
+      };
+    }
+  } catch {
+    // fontfaceobserver might be loaded asynchronously
+  }
+
+  const isFontTimeout = (err: any) => {
+    if (!err) return false;
+    const msg = typeof err === 'string' ? err : err?.message || String(err || '');
+    const stack = err?.stack || '';
+    return (
+      msg.includes('timeout exceeded') ||
+      msg.includes('6000ms') ||
+      stack.includes('fontfaceobserver') ||
+      stack.includes('ExpoFontLoader')
+    );
+  };
+
+  // 2. Capture-phase error listener to stop Expo ErrorOverlay from intercepting font timeout errors
+  window.addEventListener(
+    'error',
+    (event: ErrorEvent) => {
+      if (
+        isFontTimeout(event.error) ||
+        isFontTimeout(event.message) ||
+        (event.filename && event.filename.includes('fontfaceobserver'))
+      ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        console.warn('[FontLoader] Non-fatal font timeout event intercepted on Web:', event.message || event.error);
+      }
+    },
+    true
+  );
+
+  // 3. Capture-phase unhandled rejection listener
+  window.addEventListener(
+    'unhandledrejection',
+    (event: PromiseRejectionEvent) => {
+      if (isFontTimeout(event.reason)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        console.warn('[FontLoader] Non-fatal font unhandled rejection intercepted on Web:', event.reason);
+      }
+    },
+    true
+  );
+}
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useOnboardingStatus } from '@/hooks/use-onboarding-status';

@@ -32,6 +32,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
+    if (error?.message?.includes('timeout exceeded')) {
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 
