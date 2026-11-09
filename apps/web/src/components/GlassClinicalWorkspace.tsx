@@ -216,94 +216,95 @@ Follow-Up: ${soapData.plan.followUp}
 
   return (
     <div className="space-y-4">
-      {/* ================= 1. HEADER & SUPERINTELLIGENCE BADGE ================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-md">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/30">
-            <Stethoscope className="w-5 h-5" />
+      {/* ================= 1. HEADER & SUPERINTELLIGENCE BADGE (CLEAN & COMPACT WITH ICON BUTTONS) ================= */}
+      <div className="flex items-center justify-between p-3 px-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-sm border border-slate-800">
+        <div className="flex items-center space-x-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-400 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 shrink-0">
+            <Stethoscope className="w-4 h-4" />
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h2 className="text-base font-extrabold tracking-tight">Clinical Superintelligence</h2>
-              <span className="px-2 py-0.5 rounded-full bg-sky-400/20 text-sky-300 border border-sky-400/30 text-[10px] font-mono font-bold">
-                Glass AI Architecture
+          <div className="min-w-0">
+            <div className="flex items-center space-x-1.5">
+              <h2 className="text-xs sm:text-sm font-extrabold tracking-tight text-white truncate">
+                Clinical Superintelligence
+              </h2>
+              <span className="px-1.5 py-0.2 rounded-full bg-sky-400/20 text-sky-300 text-[9px] font-mono font-bold shrink-0">
+                Glass AI
               </span>
             </div>
-            <p className="text-xs text-sky-200/80 mt-0.5">
-              Point-of-Care SOAP Scribe, Stratified DDx, & Evidence-Based Decision Support
+            <p className="text-[10px] text-slate-400 truncate hidden sm:block">
+              Point-of-Care SOAP, DDx &amp; Decision Support
             </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-2">
+        {/* Action Buttons: Simple Icon Buttons with Tooltips */}
+        <div className="flex items-center space-x-1.5 shrink-0">
           <button
             onClick={handleCopySOAP}
-            className={`inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
               isCopied
-                ? 'bg-emerald-500 text-white shadow-sm'
-                : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
+                : 'bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white border border-white/10'
             }`}
-            title="Salin Catatan Klinis format SIMRS / EHR"
+            title={isCopied ? 'Tersalin ke EHR / SIMRS!' : 'Salin Catatan ke EHR'}
+            aria-label="Salin Catatan ke EHR"
           >
-            {isCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{isCopied ? 'Tersalin ke EHR!' : 'Salin ke EHR'}</span>
+            {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
 
           <button
             onClick={handleRegenerateSOAP}
             disabled={isRegenerating}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md transition-all"
+            className="w-8 h-8 rounded-xl bg-sky-500 hover:bg-sky-400 text-white flex items-center justify-center shadow-md shadow-sky-500/30 transition-all disabled:opacity-50"
+            title="Update &amp; Regenerate Diagnosis AI"
+            aria-label="Update AI"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRegenerating ? 'animate-spin' : ''}`} />
-            <span>Update AI</span>
+            <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* ================= 2. WORKSPACE NAV TABS ================= */}
-      <div className="flex items-center border-b border-sky-100 bg-white rounded-xl p-1 gap-1 text-xs select-none">
+      {/* ================= 2. WORKSPACE NAV TABS: SIMPLE WITH ICONS ================= */}
+      <div className="grid grid-cols-3 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 gap-1 text-xs select-none">
         <button
           onClick={() => setActiveSection('soap')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-bold transition-all ${
+          className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg font-bold transition-all ${
             activeSection === 'soap'
-              ? 'bg-sky-50 text-sky-800 border border-sky-200 shadow-2xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white text-sky-700 shadow-xs border border-sky-200/80'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
           }`}
+          title="Catatan SOAP & H&P"
         >
-          <FileText className="w-4 h-4 text-sky-600" />
-          <span>Catatan SOAP & H&P</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <FileText className="w-4 h-4 text-sky-600 shrink-0" />
+          <span className="truncate">SOAP</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
         </button>
 
         <button
           onClick={() => setActiveSection('ddx')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-bold transition-all ${
+          className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg font-bold transition-all relative ${
             activeSection === 'ddx'
-              ? 'bg-rose-50 text-rose-800 border border-rose-200 shadow-2xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white text-rose-700 shadow-xs border border-rose-200/80'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
           }`}
+          title="Differential Diagnosis (DDx) & Can't-Miss Red Flags"
         >
-          <AlertTriangle className="w-4 h-4 text-rose-600" />
-          <span>Differential Diagnosis (DDx)</span>
-          <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-800 text-[9px] font-extrabold">
-            Can't-Miss Red Flags
-          </span>
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="truncate">DDx</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
         </button>
 
         <button
           onClick={() => setActiveSection('calculators')}
-          className={`flex-1 inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg font-bold transition-all ${
+          className={`flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg font-bold transition-all ${
             activeSection === 'calculators'
-              ? 'bg-purple-50 text-purple-800 border border-purple-200 shadow-2xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-white text-purple-700 shadow-xs border border-purple-200/80'
+              : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
           }`}
+          title="Kalkulator Risiko Klinis"
         >
-          <Calculator className="w-4 h-4 text-purple-600" />
-          <span>Kalkulator Klinis</span>
-          <span className="px-1.5 py-0.2 rounded-full bg-purple-100 text-purple-800 text-[9px] font-extrabold">
-            Live Vitals
-          </span>
+          <Calculator className="w-4 h-4 text-purple-600 shrink-0" />
+          <span className="truncate">Kalkulator</span>
         </button>
       </div>
 
