@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { SetbackRecoveryEngine, SetbackDetectionResult } from '@/lib/services/setback-recovery-engine';
 
 interface MicroHabit {
   id: string;
@@ -115,6 +116,38 @@ export default function AdaptiveHabitsScreen() {
   const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState<boolean>(false);
   const [selectedHabitForRecovery, setSelectedHabitForRecovery] = useState<MicroHabit | null>(null);
   const [selectedBarrier, setSelectedBarrier] = useState<string>('fatigue');
+
+  // Continuous Learning & Detection Result
+  const [detectionResult, setDetectionResult] = useState<SetbackDetectionResult>(() =>
+    SetbackRecoveryEngine.evaluateEngagement(
+      Date.now() - 26 * 60 * 60 * 1000,
+      7500,
+      1950,
+      41,
+      false
+    )
+  );
+  const [isDiagnosticRunning, setIsDiagnosticRunning] = useState<boolean>(false);
+
+  const handleRunDiagnostic = () => {
+    setIsDiagnosticRunning(true);
+    setTimeout(() => {
+      setDetectionResult(
+        SetbackRecoveryEngine.evaluateEngagement(
+          Date.now() - 28 * 60 * 60 * 1000,
+          8000,
+          1800,
+          42,
+          true
+        )
+      );
+      setIsDiagnosticRunning(false);
+      Alert.alert(
+        'Analisis Hambatan Selesai 🤖',
+        'Sistem mendeteksi hambatan cuaca panas ekstrem (42°C) dan jam kerja panjang. Kanal dialihkan ke mode hening empati (GENTLE_IN_APP) dan target disesuaikan tanpa penalti.'
+      );
+    }, 600);
+  };
 
   // Behavioral Metrics
   const [bankedDays, setBankedDays] = useState<number>(24);
@@ -223,6 +256,86 @@ export default function AdaptiveHabitsScreen() {
               {isArabicMode ? 'أواجه يوماً صعباً (تفعيل خطة التعافي المرنة)' : 'Hari Ini Berat? Aktifkan Soft Landing Recovery'}
             </Text>
           </TouchableOpacity>
+        </View>
+
+        {/* CONTINUOUS LEARNING & PASSIVE BARRIER DIAGNOSTIC (CRITERIA 2) */}
+        <View style={[styles.learningEngineCard, { backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF' }]}>
+          <View style={styles.learningHeader}>
+            <View style={styles.learningTitleWrap}>
+              <Ionicons name="hardware-chip" size={16} color="#007AFF" />
+              <Text style={styles.learningHeaderTitle}>
+                {isArabicMode ? 'التعلم المستمر واكتشاف العوائق تلقائياً' : 'CONTINUOUS LEARNING & BARRIER DETECTOR'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleRunDiagnostic}
+              style={styles.runDiagBtn}
+              disabled={isDiagnosticRunning}
+            >
+              <Ionicons name="refresh" size={12} color="#007AFF" />
+              <Text style={styles.runDiagText}>
+                {isDiagnosticRunning ? 'Menganalisis...' : 'Analisis Ulang'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Diagnostic Badges Row */}
+          <View style={styles.diagSignalsRow}>
+            <View style={styles.diagSignalPill}>
+              <Text style={styles.diagSignalLabel}>Inactivity:</Text>
+              <Text style={styles.diagSignalVal}>{detectionResult.inactivityHours} Jam</Text>
+            </View>
+            <View style={styles.diagSignalPill}>
+              <Text style={styles.diagSignalLabel}>Telemetry Drop:</Text>
+              <Text style={[styles.diagSignalVal, { color: '#FF3B30' }]}>
+                -{(detectionResult.telemetryDropRate * 100).toFixed(0)}%
+              </Text>
+            </View>
+            <View style={styles.diagSignalPill}>
+              <Text style={styles.diagSignalLabel}>Banked Equity:</Text>
+              <Text style={[styles.diagSignalVal, { color: '#34C759' }]}>
+                {detectionResult.antiZeroGuarantee.bankedDaysPreserved} Hari
+              </Text>
+            </View>
+          </View>
+
+          {/* Barrier Classification Result */}
+          <View style={styles.barrierDiagnosisBox}>
+            <View style={styles.barrierDiagTop}>
+              <View style={styles.barrierTag}>
+                <Ionicons name="alert-circle" size={14} color="#FF9500" />
+                <Text style={styles.barrierTagText}>
+                  Hambatan Terdeteksi: {detectionResult.detectedBarrier}
+                </Text>
+              </View>
+              <Text style={styles.confidenceText}>
+                Keyakinan: {(detectionResult.barrierConfidence * 100).toFixed(0)}%
+              </Text>
+            </View>
+            <Text style={styles.barrierDiagDesc}>
+              {detectionResult.detectedBarrier === 'HEAT_WEATHER'
+                ? 'Suhu Abu Dhabi ekstrem (>40°C) menghentikan aktivitas luar ruangan. Sistem secara mandiri mengalihkan kanal notifikasi tanpa menyalahkan pengguna.'
+                : 'Pola aktivitas malam atau kelelahan akut terdeteksi. Target diadaptasi otomatis.'}
+            </Text>
+          </View>
+
+          {/* Channel Adaptation & Soft Landing Blueprint */}
+          <View style={styles.channelShiftBox}>
+            <View style={styles.channelShiftItem}>
+              <Text style={styles.channelLabel}>Penyesuaian Kanal:</Text>
+              <Text style={styles.channelVal}>
+                {detectionResult.recommendedChannel === 'GENTLE_IN_APP'
+                  ? '🔇 In-App Empatis (Bebas Bunyi Alarm/Guilt-Trip)'
+                  : '🌿 Silent Rest Mode (Istirahat Penuh 24 Jam)'}
+              </Text>
+            </View>
+            <View style={styles.channelShiftItem}>
+              <Text style={styles.channelLabel}>Aksi Soft Landing:</Text>
+              <Text style={styles.channelVal}>
+                {detectionResult.softLandingPlan.adaptedMicroAction}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* ABU DHABI ECOSYSTEM & CONTEXT CONTROLS */}
@@ -716,6 +829,130 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
+  // LEARNING ENGINE CARD
+  learningEngineCard: {
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#007AFF25',
+  },
+  learningHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  learningTitleWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  learningHeaderTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#007AFF',
+    letterSpacing: 0.5,
+  },
+  runDiagBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#007AFF12',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  runDiagText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+  diagSignalsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  diagSignalPill: {
+    flex: 1,
+    backgroundColor: '#8E8E9312',
+    padding: 8,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  diagSignalLabel: {
+    fontSize: 9,
+    color: '#8E8E93',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  diagSignalVal: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  barrierDiagnosisBox: {
+    backgroundColor: '#FF95000C',
+    borderRadius: 12,
+    padding: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FF9500',
+    marginBottom: 10,
+  },
+  barrierDiagTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  barrierTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  barrierTagText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FF9500',
+  },
+  confidenceText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#8E8E93',
+  },
+  barrierDiagDesc: {
+    fontSize: 11,
+    color: '#636366',
+    lineHeight: 15,
+  },
+  channelShiftBox: {
+    backgroundColor: '#007AFF08',
+    borderRadius: 12,
+    padding: 10,
+    gap: 6,
+  },
+  channelShiftItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  channelLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#8E8E93',
+  },
+  channelVal: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#007AFF',
+    flex: 1,
+    textAlign: 'right',
+  },
+
   // CONTEXT PANEL
   contextPanel: {
     borderRadius: 20,
@@ -1152,3 +1389,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 });
+
